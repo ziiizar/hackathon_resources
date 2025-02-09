@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Search, Moon, Sun, Crown, User } from "lucide-react";
@@ -34,7 +34,18 @@ const Header = ({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { user, signOut } = useAuth();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Mock suggestions for the command palette
   const suggestions = [
@@ -45,55 +56,68 @@ const Header = ({
   ];
 
   return (
-    <header className="w-full h-[72px] px-6 bg-background border-b flex items-center justify-between fixed top-0 z-50">
-      <div className="flex items-center gap-6">
-        <h1
-          className="text-xl font-bold cursor-pointer hover:opacity-80 transition-opacity"
-          onClick={() => (window.location.href = "/")}
-        >
-          Dev Resources
-        </h1>
-        <Navigation />
-      </div>
+    <header
+      className={`fixed top-0 left-1/2 -translate-x-1/2 z-50 transition-all duration-100 ease-in-out w-full text-white
+        ${isScrolled ? "mt-4 text-black" : ""}`}
+    >
+      <div
+        className={`mx-auto flex items-center justify-between transition-all duration-300 ease-in-out
+          ${
+            isScrolled
+              ? "w-[95%] max-w-[1000px] h-12 px-6 bg-background/80 backdrop-blur-md border rounded-full shadow-lg"
+              : "w-full h-16 px-6 bg-transparent"
+          }
+        `}
+      >
+        <div className="flex items-center gap-6">
+          <h1
+            className="text-xl font-bold cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => (window.location.href = "/")}
+          >
+            Dev Resources
+          </h1>
+          <Navigation />
+        </div>
 
-      <div className="flex items-center gap-4 ml-auto">
-        {user ? (
-          <>
-            <Button
-              onClick={() =>
-                window.open(
-                  "https://www.paypal.com/paypalme/yourpaypallink/5",
-                  "_blank",
-                )
-              }
-              className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 gap-2"
-            >
-              <Crown className="h-4 w-4" />
-              Pro Lifetime ($5)
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => signOut()}>
-                  Sign Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        ) : (
-          <Button onClick={() => setShowAuthModal(true)}>Sign In</Button>
-        )}
-        <Button variant="ghost" size="icon" onClick={onThemeToggle}>
-          {isDarkMode ? (
-            <Sun className="h-5 w-5" />
+        <div className="flex items-center gap-4">
+          {user ? (
+            <>
+              <Button
+                onClick={() =>
+                  window.open(
+                    "https://www.paypal.com/paypalme/yourpaypallink/5",
+                    "_blank",
+                  )
+                }
+                className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 gap-2"
+              >
+                <Crown className="h-4 w-4" />
+                Pro Lifetime ($5)
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           ) : (
-            <Moon className="h-5 w-5" />
+            <Button onClick={() => setShowAuthModal(true)}>Sign In</Button>
           )}
-        </Button>
+          <Button variant="ghost" size="icon" onClick={onThemeToggle}>
+            {isDarkMode ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
       </div>
 
       <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />

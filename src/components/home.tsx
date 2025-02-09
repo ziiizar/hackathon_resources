@@ -48,7 +48,7 @@ const Home = () => {
         onThemeToggle={handleThemeToggle}
         onSearch={handleSearch}
       />
-      <main className="pt-[72px]">
+      <main className="">
         <HeroSection />
         <ProMembershipSection />
         <FeaturesSection />

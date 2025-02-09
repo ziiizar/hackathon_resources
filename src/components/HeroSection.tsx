@@ -3,15 +3,14 @@ import { ArrowRight } from "lucide-react";
 
 const HeroSection = () => {
   return (
-    <div className="relative  background-radial-gradient py-24 px-6 h-screen" >
+    <div className="relative background-radial-gradient px-6 text-white min-h-screen flex items-center">
       <div className="max-w-4xl mx-auto text-center">
         <h1 className="text-5xl font-bold tracking-tight mb-6 text-white">
           Your Gateway to Development Excellence
         </h1>
         <p className="text-xl text-muted-foreground mb-8">
-          Discover curated resources for developers at every level. From
-          frontend to backend, DevOps to essential tools - everything you need
-          to level up your skills.
+          Discover curated resources for developers. Everything you need to
+          level up your workflows.
         </p>
         <div className="flex gap-4 justify-center">
           <Button
