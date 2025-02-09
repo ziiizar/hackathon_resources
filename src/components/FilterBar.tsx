@@ -1,0 +1,142 @@
+import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { Input } from "./ui/input";
+import { Search } from "lucide-react";
+import { getCategories } from "@/lib/api";
+import type { Category } from "@/lib/api";
+
+interface FilterBarProps {
+  onSearch?: (query: string) => void;
+  onCategoryChange?: (categoryId: string | null) => void;
+  onSubcategoryChange?: (subcategoryId: string | null) => void;
+  onPriceFilterChange?: (isPaid: boolean | null) => void;
+}
+
+const FilterBar = ({
+  onSearch = () => {},
+  onCategoryChange = () => {},
+  onSubcategoryChange = () => {},
+  onPriceFilterChange = () => {},
+}: FilterBarProps) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(
+    null,
+  );
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await getCategories();
+        console.log("Loaded categories:", data); // Debug log
+        setCategories(data);
+      } catch (error) {
+        console.error("Failed to load categories:", error);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  const handleCategoryChange = (value: string) => {
+    const categoryId = value === "all" ? null : value;
+    setSelectedCategory(categoryId);
+    setSelectedSubcategory(null);
+    onCategoryChange(categoryId);
+    onSubcategoryChange(null);
+  };
+
+  const handleSubcategoryChange = (value: string) => {
+    const subcategoryId = value === "all" ? null : value;
+    setSelectedSubcategory(subcategoryId);
+    onSubcategoryChange(subcategoryId);
+  };
+
+  const selectedCategoryData = categories.find(
+    (cat) => cat.id === selectedCategory,
+  );
+
+  return (
+    <div className="w-full h-[60px] bg-white border-b flex items-center px-6 gap-4">
+      <div className="relative flex-1 max-w-md">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <Input
+          placeholder="Search resources..."
+          className="pl-10"
+          onChange={(e) => onSearch(e.target.value)}
+        />
+      </div>
+
+      <Select
+        value={selectedCategory || "all"}
+        onValueChange={handleCategoryChange}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Category" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Categories</SelectItem>
+          {categories.map((category) => (
+            <SelectItem key={category.id} value={category.id}>
+              {category.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={selectedSubcategory || "all"}
+        onValueChange={handleSubcategoryChange}
+        disabled={!selectedCategory}
+      >
+        <SelectTrigger className="w-[200px]">
+          <SelectValue placeholder="Subcategory" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Subcategories</SelectItem>
+          {selectedCategoryData?.subcategories?.map((subcategory) => (
+            <SelectItem key={subcategory.id} value={subcategory.id}>
+              {subcategory.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPriceFilterChange(null)}
+          className="gap-2"
+        >
+          <Badge variant="outline">All</Badge>
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPriceFilterChange(false)}
+          className="gap-2"
+        >
+          <Badge variant="secondary">Free</Badge>
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPriceFilterChange(true)}
+          className="gap-2"
+        >
+          <Badge variant="destructive">Paid</Badge>
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default FilterBar;
