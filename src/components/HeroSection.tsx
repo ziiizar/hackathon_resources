@@ -3,9 +3,9 @@ import { ArrowRight } from "lucide-react";
 
 const HeroSection = () => {
   return (
-    <div className="relative bg-background py-24 px-6">
+    <div className="relative  background-radial-gradient py-24 px-6 h-screen" >
       <div className="max-w-4xl mx-auto text-center">
-        <h1 className="text-5xl font-bold tracking-tight mb-6">
+        <h1 className="text-5xl font-bold tracking-tight mb-6 text-white">
           Your Gateway to Development Excellence
         </h1>
         <p className="text-xl text-muted-foreground mb-8">
