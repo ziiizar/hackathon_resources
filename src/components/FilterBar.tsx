@@ -17,14 +17,12 @@ interface FilterBarProps {
   onSearch?: (query: string) => void;
   onCategoryChange?: (categoryId: string | null) => void;
   onSubcategoryChange?: (subcategoryId: string | null) => void;
-  onPriceFilterChange?: (isPaid: boolean | null) => void;
 }
 
 const FilterBar = ({
   onSearch = () => {},
   onCategoryChange = () => {},
   onSubcategoryChange = () => {},
-  onPriceFilterChange = () => {},
 }: FilterBarProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -108,33 +106,6 @@ const FilterBar = ({
           ))}
         </SelectContent>
       </Select>
-
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPriceFilterChange(null)}
-          className="gap-2"
-        >
-          <Badge variant="outline">All</Badge>
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPriceFilterChange(false)}
-          className="gap-2"
-        >
-          <Badge variant="secondary">Free</Badge>
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPriceFilterChange(true)}
-          className="gap-2"
-        >
-          <Badge variant="destructive">Paid</Badge>
-        </Button>
-      </div>
     </div>
   );
 };

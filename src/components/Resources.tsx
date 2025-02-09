@@ -9,7 +9,6 @@ const Resources = () => {
     null,
   );
   const [searchQuery, setSearchQuery] = useState("");
-  const [priceFilter, setPriceFilter] = useState<boolean | null>(null);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -24,10 +23,6 @@ const Resources = () => {
     setSelectedSubcategory(subcategoryId);
   };
 
-  const handlePriceFilterChange = (isPaid: boolean | null) => {
-    setPriceFilter(isPaid);
-  };
-
   return (
     <div className="min-h-screen bg-[#0B1121]">
       <Header onSearch={handleSearch} />
@@ -36,13 +31,11 @@ const Resources = () => {
           onSearch={handleSearch}
           onCategoryChange={handleCategoryChange}
           onSubcategoryChange={handleSubcategoryChange}
-          onPriceFilterChange={handlePriceFilterChange}
         />
         <ResourceGrid
           selectedCategory={selectedCategory}
           selectedSubcategory={selectedSubcategory}
           searchQuery={searchQuery}
-          isPaid={priceFilter}
         />
       </main>
     </div>
