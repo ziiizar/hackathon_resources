@@ -9,6 +9,9 @@ TempoDevtools.init();
 
 const basename = import.meta.env.BASE_URL;
 
+// Force dark mode
+document.documentElement.classList.add("dark");
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter basename={basename}>

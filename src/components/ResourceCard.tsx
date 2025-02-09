@@ -52,14 +52,14 @@ export const ResourceCard = ({
   return (
     <TooltipProvider>
       <Card
-        className="w-full h-[140px] bg-white hover:shadow-md transition-all duration-300 cursor-pointer border border-border/50 hover:bg-accent/50"
+        className="w-full h-[140px] bg-[#0F172A] hover:bg-[#1E293B] transition-all duration-300 cursor-pointer border border-gray-800/50 hover:border-violet-500/30"
         onClick={handleClick}
       >
         <CardHeader className="pb-1 pt-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Icon className="w-5 h-5 text-muted-foreground" />
-              <h3 className="text-base font-medium">{title}</h3>
+              <h3 className="text-base font-medium text-white">{title}</h3>
             </div>
             <Tooltip>
               <TooltipTrigger>
@@ -74,9 +74,7 @@ export const ResourceCard = ({
           </div>
         </CardHeader>
         <CardContent className="pb-1 pt-0">
-          <p className="text-muted-foreground text-sm line-clamp-2">
-            {description}
-          </p>
+          <p className="text-gray-400 text-sm line-clamp-2">{description}</p>
         </CardContent>
         <CardFooter className="flex justify-between items-center">
           <Badge variant="outline">{subcategory}</Badge>

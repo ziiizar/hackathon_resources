@@ -21,16 +21,10 @@ import {
 } from "./ui/dropdown-menu";
 
 interface HeaderProps {
-  onThemeToggle?: () => void;
-  isDarkMode?: boolean;
   onSearch?: (query: string) => void;
 }
 
-const Header = ({
-  onThemeToggle = () => {},
-  isDarkMode = false,
-  onSearch = () => {},
-}: HeaderProps) => {
+const Header = ({ onSearch = () => {} }: HeaderProps) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -89,10 +83,11 @@ const Header = ({
                     "_blank",
                   )
                 }
-                className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 gap-2"
+                className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-medium px-6 gap-2 shadow-lg shadow-violet-500/20 transition-all duration-300 hover:shadow-violet-500/40"
+                size="sm"
               >
                 <Crown className="h-4 w-4" />
-                Pro Lifetime ($5)
+                Pro Access
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -110,13 +105,6 @@ const Header = ({
           ) : (
             <Button onClick={() => setShowAuthModal(true)}>Sign In</Button>
           )}
-          <Button variant="ghost" size="icon" onClick={onThemeToggle}>
-            {isDarkMode ? (
-              <Sun className="h-5 w-5" />
-            ) : (
-              <Moon className="h-5 w-5" />
-            )}
-          </Button>
         </div>
       </div>
 

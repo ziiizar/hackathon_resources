@@ -14,30 +14,41 @@ const ProMembershipSection = () => {
   ];
 
   return (
-    <div className="bg-gradient-to-b from-background to-muted py-24 px-6">
+    <div className="bg-[#0B1121] py-24 px-6">
       <div className="max-w-4xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-800 px-4 py-1 rounded-full mb-6">
+        <div className="inline-flex items-center gap-2 bg-yellow-100/10 text-yellow-300 px-4 py-1.5 rounded-full mb-8">
           <Crown className="h-4 w-4" />
-          <span className="text-sm font-medium">Special Offer</span>
+          <span className="text-sm font-medium">
+            Special Offer - Ends February 25th
+          </span>
         </div>
 
-        <h2 className="text-4xl font-bold mb-4">
+        <h1 className="text-5xl font-bold text-white mb-4">
           Unlock All Premium Resources
-        </h2>
-        <p className="text-xl text-muted-foreground mb-8">
+        </h1>
+        <p className="text-xl text-gray-400 mb-16">
           One-time payment, lifetime access to all premium content
         </p>
 
-        <div className="bg-card/50 backdrop-blur-sm border rounded-xl p-8 mb-8 max-w-md mx-auto hover:border-primary/50 transition-colors">
-          <div className="flex items-baseline justify-center gap-2 mb-6">
-            <span className="text-4xl font-bold">$5</span>
-            <span className="text-muted-foreground">/lifetime</span>
+        <div className="bg-[#0F172A] border border-gray-800 rounded-2xl p-12 max-w-lg mx-auto">
+          <div className="flex flex-col items-center gap-2 mb-8">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl text-gray-500 line-through">$12</span>
+              <span className="text-6xl font-bold text-white">$5</span>
+              <span className="text-gray-400 text-xl self-end">/lifetime</span>
+            </div>
+            <div className="bg-green-500/10 text-green-400 text-sm font-medium px-3 py-1 rounded-full">
+              Save 58% today
+            </div>
           </div>
 
-          <ul className="space-y-3 text-left mb-8">
+          <ul className="space-y-4 text-left mb-8">
             {features.map((feature) => (
-              <li key={feature} className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-green-500" />
+              <li
+                key={feature}
+                className="flex items-center gap-3 text-gray-300"
+              >
+                <Check className="h-5 w-5 text-green-400" />
                 <span>{feature}</span>
               </li>
             ))}
@@ -46,7 +57,7 @@ const ProMembershipSection = () => {
           <Button
             onClick={handlePurchase}
             size="lg"
-            className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 gap-2"
+            className="w-full h-14 text-lg font-medium bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white gap-2 shadow-lg shadow-violet-500/20 transition-all duration-300 hover:shadow-violet-500/40"
           >
             <Crown className="h-5 w-5" />
             Get Pro Lifetime Access

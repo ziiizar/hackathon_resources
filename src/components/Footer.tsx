@@ -95,15 +95,33 @@ const Footer = () => {
           <div>
             <h4 className="text-sm font-semibold mb-4">Connect</h4>
             <div className="flex space-x-2">
-              <Button variant="ghost" size="icon">
-                <Github className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Twitter className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Linkedin className="h-4 w-4" />
-              </Button>
+              <a
+                href="https://github.com/ziiizar/hackathon_resources"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="ghost" size="icon">
+                  <Github className="h-4 w-4" />
+                </Button>
+              </a>
+              <a
+                href="https://x.com/Cesar47528113"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="ghost" size="icon">
+                  <Twitter className="h-4 w-4" />
+                </Button>
+              </a>
+              <a
+                href="https://www.linkedin.com/in/cesar-ferrando/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="ghost" size="icon">
+                  <Linkedin className="h-4 w-4" />
+                </Button>
+              </a>
             </div>
           </div>
         </div>

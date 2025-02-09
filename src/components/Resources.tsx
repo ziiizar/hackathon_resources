@@ -4,18 +4,12 @@ import FilterBar from "./FilterBar";
 import ResourceGrid from "./ResourceGrid";
 
 const Resources = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(
     null,
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [priceFilter, setPriceFilter] = useState<boolean | null>(null);
-
-  const handleThemeToggle = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle("dark");
-  };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -35,12 +29,8 @@ const Resources = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header
-        isDarkMode={isDarkMode}
-        onThemeToggle={handleThemeToggle}
-        onSearch={handleSearch}
-      />
+    <div className="min-h-screen bg-[#0B1121]">
+      <Header onSearch={handleSearch} />
       <main className="pt-[72px]">
         <FilterBar
           onSearch={handleSearch}

@@ -63,7 +63,7 @@ const ResourceGrid = ({
   if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
   return (
-    <div className="w-full min-h-screen bg-background p-8 overflow-y-auto">
+    <div className="w-full min-h-screen bg-[#0B1121] p-8 overflow-y-auto">
       <div className="max-w-[1200px] mx-auto">
         {filteredResources.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">

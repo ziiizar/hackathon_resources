@@ -9,18 +9,12 @@ type DifficultyLevel = "Beginner" | "Intermediate" | "Advanced";
 type ResourceType = "Frontend" | "Design" | "AI Agents" | "AI Chats";
 
 const Home = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState<ResourceType[]>([]);
   const [selectedDifficulties, setSelectedDifficulties] = useState<
     DifficultyLevel[]
   >([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [priceFilter, setPriceFilter] = useState<boolean | null>(null);
-
-  const handleThemeToggle = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle("dark");
-  };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -44,11 +38,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header
-        isDarkMode={isDarkMode}
-        onThemeToggle={handleThemeToggle}
-        onSearch={handleSearch}
-      />
+      <Header onSearch={handleSearch} />
       <main className="">
         <HeroSection />
         <ProMembershipSection />
