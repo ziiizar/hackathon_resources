@@ -3,6 +3,7 @@ import Header from "./Header";
 import HeroSection from "./HeroSection";
 import FeaturesSection from "./FeaturesSection";
 import ProMembershipSection from "./ProMembershipSection";
+import Footer from "./Footer";
 
 type DifficultyLevel = "Beginner" | "Intermediate" | "Advanced";
 type ResourceType = "Frontend" | "Design" | "AI Agents" | "AI Chats";
@@ -53,6 +54,7 @@ const Home = () => {
         <ProMembershipSection />
         <FeaturesSection />
       </main>
+      <Footer />
     </div>
   );
 };

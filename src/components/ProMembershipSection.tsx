@@ -28,7 +28,7 @@ const ProMembershipSection = () => {
           One-time payment, lifetime access to all premium content
         </p>
 
-        <div className="bg-card border rounded-xl p-8 mb-8 max-w-md mx-auto">
+        <div className="bg-card/50 backdrop-blur-sm border rounded-xl p-8 mb-8 max-w-md mx-auto hover:border-primary/50 transition-colors">
           <div className="flex items-baseline justify-center gap-2 mb-6">
             <span className="text-4xl font-bold">$5</span>
             <span className="text-muted-foreground">/lifetime</span>

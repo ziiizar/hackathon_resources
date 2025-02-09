@@ -20,7 +20,7 @@ const Navigation = () => {
             key={item.path}
             variant={location.pathname === item.path ? "default" : "ghost"}
             size="sm"
-            className="gap-2 font-medium transition-colors"
+            className="gap-2 font-medium transition-colors hover:bg-white/10"
             onClick={() => navigate(item.path)}
           >
             <Icon className="h-4 w-4" />

@@ -57,15 +57,15 @@ const Header = ({
 
   return (
     <header
-      className={`fixed top-0 left-1/2 -translate-x-1/2 z-50 transition-all duration-100 ease-in-out w-full text-white
-        ${isScrolled ? "mt-4 text-black" : ""}`}
+      className={`fixed top-0 left-1/2 -translate-x-1/2 z-50 transition-all duration-100 ease-in-out w-full
+        ${isScrolled ? "mt-4" : ""}`}
     >
       <div
         className={`mx-auto flex items-center justify-between transition-all duration-300 ease-in-out
           ${
             isScrolled
-              ? "w-[95%] max-w-[1000px] h-12 px-6 bg-background/80 backdrop-blur-md border rounded-full shadow-lg"
-              : "w-full h-16 px-6 bg-transparent"
+              ? "w-[95%] max-w-[1000px] h-12 px-6 bg-background/80 backdrop-blur-md border rounded-full shadow-lg text-foreground dark:text-white"
+              : "w-full h-16 px-6 bg-transparent text-white"
           }
         `}
       >

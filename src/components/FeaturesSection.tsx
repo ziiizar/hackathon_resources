@@ -26,14 +26,17 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <div className="bg-muted/50 py-24 px-6">
+    <div className="bg-gradient-to-b from-background to-muted py-24 px-6">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-12">What We Offer</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature) => {
             const Icon = feature.icon;
             return (
-              <Card key={feature.title} className="bg-background">
+              <Card
+                key={feature.title}
+                className="bg-background/50 backdrop-blur-sm border-muted hover:border-primary/50 transition-colors"
+              >
                 <CardContent className="pt-6">
                   <div className="rounded-lg p-3 bg-primary/10 w-fit mb-4">
                     <Icon className="w-6 h-6 text-primary" />

@@ -20,9 +20,6 @@ const HeroSection = () => {
           >
             Explore Resources <ArrowRight className="w-4 h-4" />
           </Button>
-          <Button size="lg" variant="outline">
-            Learn More
-          </Button>
         </div>
       </div>
     </div>
