@@ -2,7 +2,7 @@ import { supabase } from "./supabase";
 import type { Database } from "@/types/database";
 
 export type Resource = Database["public"]["Tables"]["resources"]["Row"];
-export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+
 export type Category = Database["public"]["Tables"]["categories"]["Row"] & {
   subcategories: Subcategory[];
 };
@@ -17,8 +17,8 @@ export async function getResources() {
     .select(
       `
       *,
-      subcategories!inner (*, 
-        categories!inner (*)
+      subcategories (*, 
+        categories (*)
       )
     `,
     )
@@ -43,7 +43,7 @@ export async function getCategories() {
     throw error;
   }
   console.log("Fetched categories:", data);
-  return data;
+  return data || [];
 }
 
 export async function getSubcategories() {
