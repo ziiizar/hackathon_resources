@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import { Code, Database, Server, Wrench } from "lucide-react";
+import { Code, Database, Server, Wrench, ExternalLink } from "lucide-react";
 
 import type { ResourceType } from "@/lib/data";
 
@@ -35,6 +35,21 @@ const getIconByType = (type: ResourceType) => {
   }
 };
 
+const getCategoryColor = (type: ResourceType) => {
+  switch (type) {
+    case "Frontend":
+      return "bg-blue-500/10 text-blue-400 border-blue-500/20";
+    case "Design":
+      return "bg-purple-500/10 text-purple-400 border-purple-500/20";
+    case "AI Agents":
+      return "bg-green-500/10 text-green-400 border-green-500/20";
+    case "AI Chats":
+      return "bg-orange-500/10 text-orange-400 border-orange-500/20";
+    default:
+      return "bg-gray-500/10 text-gray-400 border-gray-500/20";
+  }
+};
+
 export const ResourceCard = ({
   title = "Sample Resource",
   description = "This is a sample resource description that provides an overview of what this resource category contains.",
@@ -44,6 +59,7 @@ export const ResourceCard = ({
   url = "#",
 }: ResourceCardProps) => {
   const Icon = getIconByType(type);
+  const categoryColor = getCategoryColor(type);
 
   const handleClick = () => {
     window.open(url, "_blank", "noopener,noreferrer");
@@ -52,18 +68,25 @@ export const ResourceCard = ({
   return (
     <TooltipProvider>
       <Card
-        className="w-full h-[140px] bg-[#0F172A] hover:bg-[#1E293B] transition-all duration-300 cursor-pointer border border-gray-800/50 hover:border-violet-500/30"
+        className="group relative flex flex-col h-[140px] bg-[#0F172A] hover:bg-[#1E293B] transition-all duration-300 cursor-pointer border border-gray-800/50 hover:border-violet-500/30"
         onClick={handleClick}
       >
-        <CardHeader className="pb-1 pt-3">
+        <CardHeader className="pb-1 pt-3 flex-none">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Icon className="w-5 h-5 text-muted-foreground" />
-              <h3 className="text-base font-medium text-white">{title}</h3>
+              <div className={`p-1.5 rounded ${categoryColor}`}>
+                <Icon className="w-4 h-4" />
+              </div>
+              <h3 className="text-base font-medium text-white line-clamp-1">
+                {title}
+              </h3>
             </div>
             <Tooltip>
               <TooltipTrigger>
-                <Badge variant={isPaid ? "destructive" : "default"}>
+                <Badge
+                  variant={isPaid ? "destructive" : "default"}
+                  className="flex-none"
+                >
                   {isPaid ? "Paid" : "Free"}
                 </Badge>
               </TooltipTrigger>
@@ -73,13 +96,23 @@ export const ResourceCard = ({
             </Tooltip>
           </div>
         </CardHeader>
-        <CardContent className="pb-1 pt-0">
-          <p className="text-gray-400 text-sm line-clamp-2">{description}</p>
+
+        <CardContent className="pb-1 pt-0 flex-grow">
+          <p className="text-sm text-gray-400 line-clamp-2">{description}</p>
         </CardContent>
-        <CardFooter className="flex justify-between items-center">
-          <Badge variant="outline">{subcategory}</Badge>
-          <Badge variant="secondary">{type}</Badge>
+
+        <CardFooter className="flex justify-between items-center mt-auto pt-0 pb-3">
+          <Badge variant="outline" className={`${categoryColor} border`}>
+            {subcategory}
+          </Badge>
+          <Badge variant="secondary" className={categoryColor}>
+            {type}
+          </Badge>
         </CardFooter>
+
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <ExternalLink className="w-4 h-4 text-gray-400" />
+        </div>
       </Card>
     </TooltipProvider>
   );
