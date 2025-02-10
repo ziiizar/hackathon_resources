@@ -21,24 +21,38 @@ const ResourceGrid = ({
   const [resources, setResources] = useState<ResourceWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<{ is_pro: boolean } | null>(null);
 
   useEffect(() => {
-    const loadResources = async () => {
+    const loadData = async () => {
       try {
-        const { data: authData } = await supabase.auth.getSession();
-        console.log("Session:", authData.session);
+        setLoading(true);
 
+        // Cargar el perfil del usuario si está autenticado
+        if (user) {
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .single();
+          console.log("Profile data:", profileData);
+          setProfile(profileData);
+        }
+
+        // Cargar recursos
         const data = await getResources();
+        console.log("Resources:", data);
         setResources(data || []);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load resources");
+        console.error("Error loading data:", e);
+        setError(e instanceof Error ? e.message : "Failed to load data");
       } finally {
         setLoading(false);
       }
     };
 
-    loadResources();
+    loadData();
   }, [user]);
 
   const filteredResources = resources.filter((resource) => {
@@ -61,9 +75,16 @@ const ResourceGrid = ({
   });
 
   const visibleResources = filteredResources.filter((resource) => {
+    // Si el recurso es gratuito, siempre mostrarlo
     if (!resource.is_paid) return true;
+
+    // Si no hay usuario logueado, no mostrar recursos pagos
     if (!user) return false;
+
+    // Si hay usuario logueado pero no es pro, no mostrar recursos pagos
     if (!profile?.is_pro) return false;
+
+    // Si el usuario es pro, mostrar todo
     return true;
   });
 
