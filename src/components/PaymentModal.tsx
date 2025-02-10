@@ -21,7 +21,7 @@ export function PaymentModal({ open, onOpenChange }: PaymentModalProps) {
   const { user } = useAuth();
 
   const handlePaypalRedirect = () => {
-    window.open("https://www.paypal.com/paypalme/yourpaypallink/5", "_blank");
+    window.open("https://paypal.me/ErnestoFerrando/5", "_blank");
   };
 
   const handleConfirmPayment = async () => {

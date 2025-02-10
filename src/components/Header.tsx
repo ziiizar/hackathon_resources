@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Search, Moon, Sun, Crown, User } from "lucide-react";
 import Navigation from "./Navigation";
 import { AuthModal } from "./auth/AuthModal";
+import { PaymentModal } from "./PaymentModal";
 import { useAuth } from "@/components/auth/AuthContext";
 import {
   CommandDialog,
@@ -28,6 +29,7 @@ const Header = ({ onSearch = () => {} }: HeaderProps) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { user, signOut } = useAuth();
 
@@ -49,6 +51,14 @@ const Header = ({ onSearch = () => {} }: HeaderProps) => {
     { category: "Tools", items: ["VS Code", "Git", "Postman"] },
   ];
 
+  const handleProAccess = () => {
+    if (!user) {
+      setShowAuthModal(true);
+    } else {
+      setShowPaymentModal(true);
+    }
+  };
+
   return (
     <header
       className={`fixed top-0 left-1/2 -translate-x-1/2 z-50 transition-all duration-100 ease-in-out w-full
@@ -68,40 +78,34 @@ const Header = ({ onSearch = () => {} }: HeaderProps) => {
             className="text-xl font-bold cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => (window.location.href = "/")}
           >
-            Dev Resources
+            DevHub
           </h1>
           <Navigation />
         </div>
 
         <div className="flex items-center gap-4">
+          <Button
+            onClick={handleProAccess}
+            className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-medium px-6 gap-2 shadow-lg shadow-violet-500/20 transition-all duration-300 hover:shadow-violet-500/40"
+            size="sm"
+          >
+            <Crown className="h-4 w-4" />
+            Pro Access
+          </Button>
+
           {user ? (
-            <>
-              <Button
-                onClick={() =>
-                  window.open(
-                    "https://www.paypal.com/paypalme/yourpaypallink/5",
-                    "_blank",
-                  )
-                }
-                className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-medium px-6 gap-2 shadow-lg shadow-violet-500/20 transition-all duration-300 hover:shadow-violet-500/40"
-                size="sm"
-              >
-                <Crown className="h-4 w-4" />
-                Pro Access
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <User className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => signOut()}>
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => signOut()}>
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Button onClick={() => setShowAuthModal(true)}>Sign In</Button>
           )}
@@ -109,6 +113,10 @@ const Header = ({ onSearch = () => {} }: HeaderProps) => {
       </div>
 
       <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
+      <PaymentModal
+        open={showPaymentModal}
+        onOpenChange={setShowPaymentModal}
+      />
 
       <CommandDialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
         <CommandInput placeholder="Type to search..." />
