@@ -1,9 +1,19 @@
 import { Button } from "./ui/button";
 import { Crown, Check } from "lucide-react";
+import { useState } from "react";
+import { useAuth } from "./auth/AuthContext";
+import { PaymentModal } from "./PaymentModal";
 
 const ProMembershipSection = () => {
+  const { user } = useAuth();
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
   const handlePurchase = () => {
-    window.open("https://www.paypal.com/paypalme/yourpaypallink/5", "_blank");
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
+    setShowPaymentModal(true);
   };
 
   const features = [
@@ -62,6 +72,10 @@ const ProMembershipSection = () => {
             <Crown className="h-5 w-5" />
             Get Pro Lifetime Access
           </Button>
+          <PaymentModal
+            open={showPaymentModal}
+            onOpenChange={setShowPaymentModal}
+          />
         </div>
       </div>
     </div>

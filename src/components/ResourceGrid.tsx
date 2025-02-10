@@ -6,6 +6,7 @@ import { useAuth } from "@/components/auth/AuthContext";
 import { ChevronDown } from "lucide-react";
 import { Button } from "./ui/button";
 import { supabase } from "@/lib/supabase";
+import { PaymentModal } from "./PaymentModal";
 
 interface ResourceGridProps {
   selectedCategory?: string | null;
@@ -21,8 +22,36 @@ const ResourceGrid = ({
   const [resources, setResources] = useState<ResourceWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const { user } = useAuth();
   const [profile, setProfile] = useState<{ is_pro: boolean } | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!user) {
+        setProfile(null);
+        setLoadingProfile(false);
+        return;
+      }
+
+      try {
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+        setProfile(profileData);
+      } catch (error) {
+        console.error("Error loading profile:", error);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    loadProfile();
+  }, [user]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -141,11 +170,21 @@ const ResourceGrid = ({
                     development skills to the next level
                   </p>
                   <Button
-                    onClick={() => (window.location.href = "/pricing")}
+                    onClick={() => {
+                      if (!user) {
+                        window.location.href = "/login";
+                        return;
+                      }
+                      setShowPaymentModal(true);
+                    }}
                     className="bg-violet-600 hover:bg-violet-700 text-white px-8"
                   >
                     Upgrade to Pro
                   </Button>
+                  <PaymentModal
+                    open={showPaymentModal}
+                    onOpenChange={setShowPaymentModal}
+                  />
                 </div>
               </div>
             )}
