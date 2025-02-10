@@ -76,7 +76,9 @@ const Header = ({ onSearch = () => {} }: HeaderProps) => {
         <div className="flex items-center gap-6">
           <h1
             className="text-xl font-bold cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => (window.location.href = "/")}
+            onClick={() =>
+              (window.location.href = import.meta.env.BASE_URL || "/")
+            }
           >
             DevHub
           </h1>
