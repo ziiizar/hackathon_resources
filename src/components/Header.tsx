@@ -6,6 +6,7 @@ import Navigation from "./Navigation";
 import { AuthModal } from "./auth/AuthModal";
 import { PaymentModal } from "./PaymentModal";
 import { useAuth } from "@/components/auth/AuthContext";
+import { Link } from "react-router-dom";
 import {
   CommandDialog,
   CommandEmpty,
@@ -74,28 +75,29 @@ const Header = ({ onSearch = () => {} }: HeaderProps) => {
         `}
       >
         <div className="flex items-center gap-6">
-          <h1
-            className="text-xl font-bold cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() =>
-              (window.location.href = import.meta.env.BASE_URL || "/")
-            }
+          <Link
+            to="/"
+            className="text-xl font-bold hover:opacity-80 transition-opacity"
           >
             DevHub
-          </h1>
+          </Link>
           <Navigation />
         </div>
 
         <div className="flex items-center gap-4">
-          <Button
-            onClick={() =>
-              window.open("https://paypal.me/ErnestoFerrando", "_blank")
-            }
-            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium px-6 gap-2 shadow-lg shadow-blue-500/20 transition-all duration-300 hover:shadow-blue-500/40"
-            size="sm"
+          <a
+            href="https://paypal.me/ErnestoFerrando"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <Heart className="h-4 w-4" />
-            Support Us
-          </Button>
+            <Button
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium px-6 gap-2 shadow-lg shadow-blue-500/20 transition-all duration-300 hover:shadow-blue-500/40"
+              size="sm"
+            >
+              <Heart className="h-4 w-4" />
+              Support Us
+            </Button>
+          </a>
 
           {user ? (
             <DropdownMenu>
