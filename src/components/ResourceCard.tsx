@@ -1,17 +1,32 @@
 import React from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import { Code, Database, Server, Wrench, ExternalLink } from "lucide-react";
+import {
+  Code,
+  Database,
+  Server,
+  Wrench,
+  ExternalLink,
+  Heart,
+} from "lucide-react";
+import { useAuth } from "@/components/auth/AuthContext";
+import { useEffect, useState } from "react";
+import { getLikes, toggleLike } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "./ui/use-toast";
+import { AuthModal } from "./auth/AuthModal";
 
 import type { ResourceType } from "@/lib/data";
 
 interface ResourceCardProps {
+  id?: string;
   title?: string;
   description?: string;
   type?: ResourceType;
@@ -57,7 +72,78 @@ export const ResourceCard = ({
   subcategory = "General",
   isPaid = false,
   url = "#",
+  id = "",
 }: ResourceCardProps) => {
+  const [likes, setLikes] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!id) return; // Skip if no id is provided
+
+    // Load initial likes count
+    getLikes(id).then(setLikes);
+
+    // Check if user has liked this resource
+    if (user) {
+      supabase
+        .from("likes")
+        .select("id")
+        .eq("resource_id", id)
+        .eq("user_id", user.id)
+        .maybeSingle()
+        .then(({ data }) => setIsLiked(!!data));
+    }
+
+    // Subscribe to likes changes
+    const channel = supabase
+      .channel(`likes:${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "likes",
+          filter: `resource_id=eq.${id}`,
+        },
+        () => {
+          getLikes(id).then(setLikes);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id, user]);
+
+  const handleLikeClick = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    try {
+      const newIsLiked = await toggleLike(id, user.id);
+      setIsLiked(newIsLiked);
+
+      toast({
+        title: newIsLiked ? "Resource liked!" : "Resource unliked",
+        duration: 1500,
+      });
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      toast({
+        title: "Error",
+        description: "Could not update like status",
+        variant: "destructive",
+      });
+    }
+  };
   const Icon = getIconByType(type);
   const categoryColor = getCategoryColor(type);
 
@@ -89,13 +175,28 @@ export const ResourceCard = ({
         </CardContent>
 
         <CardFooter className="flex justify-between items-center mt-auto pt-0 pb-3">
-          <Badge variant="outline" className={`${categoryColor} border`}>
-            {subcategory}
-          </Badge>
-          <Badge variant="secondary" className={categoryColor}>
-            {type}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className={`${categoryColor} border`}>
+              {subcategory}
+            </Badge>
+            <Badge variant="secondary" className={categoryColor}>
+              {type}
+            </Badge>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={handleLikeClick}
+            >
+              <Heart
+                className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : "text-gray-500"}`}
+              />
+            </Button>
+            <span className="text-sm text-gray-500">{likes}</span>
+          </div>
         </CardFooter>
+
+        <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
 
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <ExternalLink className="w-4 h-4 text-gray-400" />

@@ -82,6 +82,7 @@ const ResourceGrid = ({
               {visibleResources.map((resource) => (
                 <ResourceCard
                   key={resource.id}
+                  id={resource.id}
                   title={resource.title}
                   description={resource.description || ""}
                   type={resource.subcategories?.categories?.name}
