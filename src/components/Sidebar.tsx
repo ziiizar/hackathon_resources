@@ -125,42 +125,6 @@ const Sidebar = ({
           ))}
         </div>
       </div>
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Price</h3>
-        <div className="flex flex-col gap-2">
-          <Button
-            variant="outline"
-            onClick={() => onPriceFilterChange(null)}
-            className="justify-start"
-          >
-            <Badge variant="outline" className="mr-2">
-              All
-            </Badge>
-            All Resources
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => onPriceFilterChange(false)}
-            className="justify-start"
-          >
-            <Badge variant="secondary" className="mr-2">
-              Free
-            </Badge>
-            Free Resources
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => onPriceFilterChange(true)}
-            className="justify-start"
-          >
-            <Badge variant="destructive" className="mr-2">
-              Paid
-            </Badge>
-            Premium Resources
-          </Button>
-        </div>
-      </div>
     </aside>
   );
 };

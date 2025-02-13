@@ -81,19 +81,6 @@ export const ResourceCard = ({
                 {title}
               </h3>
             </div>
-            <Tooltip>
-              <TooltipTrigger>
-                <Badge
-                  variant={isPaid ? "destructive" : "default"}
-                  className="flex-none"
-                >
-                  {isPaid ? "Paid" : "Free"}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{isPaid ? "Requires payment" : "Free resource"}</p>
-              </TooltipContent>
-            </Tooltip>
           </div>
         </CardHeader>
 

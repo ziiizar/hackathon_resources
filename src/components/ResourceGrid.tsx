@@ -2,11 +2,8 @@ import { useEffect, useState } from "react";
 import { ResourceCard } from "./ResourceCard";
 import { getResources } from "@/lib/api";
 import type { ResourceWithRelations } from "@/lib/data";
-import { useAuth } from "@/components/auth/AuthContext";
 import { ChevronDown } from "lucide-react";
 import { Button } from "./ui/button";
-import { supabase } from "@/lib/supabase";
-import { PaymentModal } from "./PaymentModal";
 
 interface ResourceGridProps {
   selectedCategory?: string | null;
@@ -22,52 +19,11 @@ const ResourceGrid = ({
   const [resources, setResources] = useState<ResourceWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const { user } = useAuth();
-  const [profile, setProfile] = useState<{ is_pro: boolean } | null>(null);
-  const [loadingProfile, setLoadingProfile] = useState(true);
-
-  useEffect(() => {
-    const loadProfile = async () => {
-      if (!user) {
-        setProfile(null);
-        setLoadingProfile(false);
-        return;
-      }
-
-      try {
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-
-        setProfile(profileData);
-      } catch (error) {
-        console.error("Error loading profile:", error);
-      } finally {
-        setLoadingProfile(false);
-      }
-    };
-
-    loadProfile();
-  }, [user]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-
-        // Cargar el perfil del usuario si está autenticado
-        if (user) {
-          const { data: profileData } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", user.id)
-            .single();
-          console.log("Profile data:", profileData);
-          setProfile(profileData);
-        }
 
         // Cargar recursos
         const data = await getResources();
@@ -82,7 +38,7 @@ const ResourceGrid = ({
     };
 
     loadData();
-  }, [user]);
+  }, []);
 
   const filteredResources = resources.filter((resource) => {
     const categoryMatch =
