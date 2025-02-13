@@ -1,5 +1,5 @@
 import { Button } from "./ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Crown } from "lucide-react";
 
 const HeroSection = () => {
   return (
@@ -16,9 +16,21 @@ const HeroSection = () => {
           <Button
             size="lg"
             className="gap-2"
-            onClick={() => (window.location.href = "/resources")}
+            onClick={() =>
+              (window.location.href = import.meta.env.BASE_URL + "resources")
+            }
           >
             Explore Resources <ArrowRight className="w-4 h-4" />
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            className="gap-2 border-violet-500/50 text-violet-400 hover:text-violet-300"
+            onClick={() =>
+              (window.location.href = "mailto:ziizar2001@gmail.com")
+            }
+          >
+            Become Affiliate <Crown className="w-4 h-4" />
           </Button>
         </div>
       </div>

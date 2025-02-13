@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Search, Moon, Sun, Crown, User } from "lucide-react";
+import { Search, Moon, Sun, Crown, User, Heart } from "lucide-react";
 import Navigation from "./Navigation";
 import { AuthModal } from "./auth/AuthModal";
 import { PaymentModal } from "./PaymentModal";
@@ -87,12 +87,14 @@ const Header = ({ onSearch = () => {} }: HeaderProps) => {
 
         <div className="flex items-center gap-4">
           <Button
-            onClick={handleProAccess}
-            className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-medium px-6 gap-2 shadow-lg shadow-violet-500/20 transition-all duration-300 hover:shadow-violet-500/40"
+            onClick={() =>
+              window.open("https://paypal.me/ErnestoFerrando", "_blank")
+            }
+            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium px-6 gap-2 shadow-lg shadow-blue-500/20 transition-all duration-300 hover:shadow-blue-500/40"
             size="sm"
           >
-            <Crown className="h-4 w-4" />
-            Pro Access
+            <Heart className="h-4 w-4" />
+            Support Us
           </Button>
 
           {user ? (

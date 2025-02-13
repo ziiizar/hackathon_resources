@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import Header from "./Header";
 import HeroSection from "./HeroSection";
 import FeaturesSection from "./FeaturesSection";
-import ProMembershipSection from "./ProMembershipSection";
+import SupportSection from "./ProMembershipSection";
+import AffiliateSection from "./AffiliateSection";
 import Footer from "./Footer";
 
 type DifficultyLevel = "Beginner" | "Intermediate" | "Advanced";
@@ -41,8 +42,9 @@ const Home = () => {
       <Header onSearch={handleSearch} />
       <main className="">
         <HeroSection />
-        <ProMembershipSection />
+        <AffiliateSection />
         <FeaturesSection />
+        <SupportSection />
       </main>
       <Footer />
     </div>

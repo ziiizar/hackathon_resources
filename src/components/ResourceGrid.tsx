@@ -103,22 +103,7 @@ const ResourceGrid = ({
     return categoryMatch && subcategoryMatch && searchMatch;
   });
 
-  const visibleResources = filteredResources.filter((resource) => {
-    // Si el recurso es gratuito, siempre mostrarlo
-    if (!resource.is_paid) return true;
-
-    // Si no hay usuario logueado, no mostrar recursos pagos
-    if (!user) return false;
-
-    // Si hay usuario logueado pero no es pro, no mostrar recursos pagos
-    if (!profile?.is_pro) return false;
-
-    // Si el usuario es pro, mostrar todo
-    return true;
-  });
-
-  const hiddenResourcesCount =
-    filteredResources.length - visibleResources.length;
+  const visibleResources = filteredResources;
 
   if (loading) {
     return <div className="p-8 text-center">Loading resources...</div>;
@@ -150,44 +135,6 @@ const ResourceGrid = ({
                 />
               ))}
             </div>
-
-            {hiddenResourcesCount > 0 && (
-              <div className="relative mt-12">
-                <div
-                  className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0B1121]/80 to-[#0B1121] pointer-events-none"
-                  style={{ height: "200px", top: "-200px" }}
-                />
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <div className="p-4 rounded-full bg-violet-500/10 animate-bounce">
-                    <ChevronDown className="h-6 w-6 text-violet-400" />
-                  </div>
-                  <div className="text-lg font-semibold text-white">
-                    {hiddenResourcesCount} More Resource
-                    {hiddenResourcesCount !== 1 ? "s" : ""} Available
-                  </div>
-                  <p className="text-gray-400 max-w-md mb-4">
-                    Upgrade to Pro to unlock all resources and take your
-                    development skills to the next level
-                  </p>
-                  <Button
-                    onClick={() => {
-                      if (!user) {
-                        window.location.href = "/login";
-                        return;
-                      }
-                      setShowPaymentModal(true);
-                    }}
-                    className="bg-violet-600 hover:bg-violet-700 text-white px-8"
-                  >
-                    Upgrade to Pro
-                  </Button>
-                  <PaymentModal
-                    open={showPaymentModal}
-                    onOpenChange={setShowPaymentModal}
-                  />
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>
