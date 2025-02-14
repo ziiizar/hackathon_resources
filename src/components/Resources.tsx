@@ -30,24 +30,30 @@ const Resources = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1121]">
-      <Header onSearch={handleSearch} />
-      <main className="pt-[72px]">
-        <FilterBar
-          onSearch={handleSearch}
-          onCategoryChange={handleCategoryChange}
-          onSubcategoryChange={handleSubcategoryChange}
-          onSortChange={handleSortChange}
-          showFavorites={showFavorites}
-          onFavoritesChange={setShowFavorites}
-        />
-        <ResourceGrid
-          selectedCategory={selectedCategory}
-          selectedSubcategory={selectedSubcategory}
-          searchQuery={searchQuery}
-          sortBy={sortBy}
-          showFavorites={showFavorites}
-        />
+    <div className="h-screen flex flex-col bg-[#0B1121] overflow-hidden">
+      <div className="flex-none">
+        <Header onSearch={handleSearch} />
+      </div>
+      <main className="flex-1 flex flex-col pt-[72px] overflow-hidden">
+        <div className="flex-none">
+          <FilterBar
+            onSearch={handleSearch}
+            onCategoryChange={handleCategoryChange}
+            onSubcategoryChange={handleSubcategoryChange}
+            onSortChange={handleSortChange}
+            showFavorites={showFavorites}
+            onFavoritesChange={setShowFavorites}
+          />
+        </div>
+        <div className="flex-1 overflow-auto">
+          <ResourceGrid
+            selectedCategory={selectedCategory}
+            selectedSubcategory={selectedSubcategory}
+            searchQuery={searchQuery}
+            sortBy={sortBy}
+            showFavorites={showFavorites}
+          />
+        </div>
       </main>
     </div>
   );
