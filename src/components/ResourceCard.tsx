@@ -34,6 +34,7 @@ interface ResourceCardProps {
   subcategory?: string;
   isPaid?: boolean;
   url?: string;
+  created_at?: string;
 }
 
 const getIconByType = (type: ResourceType) => {
