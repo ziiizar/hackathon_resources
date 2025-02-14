@@ -155,29 +155,16 @@ export const ResourceCard = ({
 
   return (
     <TooltipProvider>
-      <Card
-        className="group relative flex flex-col h-[140px] bg-[#0F172A] hover:bg-[#1E293B] transition-all duration-300 cursor-pointer border border-gray-800/50 hover:border-violet-500/30"
-        onClick={handleClick}
-      >
+      <Card className="group relative flex flex-col h-[140px] bg-[#0F172A] hover:bg-[#1E293B] transition-all duration-300 border border-gray-800/50 hover:border-violet-500/30">
         <CardHeader className="pb-1 pt-3 flex-none">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className={`p-1.5 rounded ${categoryColor}`}>
                 <Icon className="w-4 h-4" />
               </div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-medium text-white line-clamp-1">
-                  {title}
-                </h3>
-                {isWithinLastMonth(created_at) && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-green-500/10 text-green-400 border-green-500/20"
-                  >
-                    New
-                  </Badge>
-                )}
-              </div>
+              <h3 className="text-base font-medium text-white line-clamp-1">
+                {title}
+              </h3>
             </div>
           </div>
         </CardHeader>
@@ -187,32 +174,49 @@ export const ResourceCard = ({
         </CardContent>
 
         <CardFooter className="flex justify-between items-center mt-auto pt-0 pb-3">
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className={`${categoryColor} border`}>
-              {subcategory}
-            </Badge>
-            <Badge variant="secondary" className={categoryColor}>
-              {type}
-            </Badge>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={handleLikeClick}
-            >
-              <Heart
-                className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : "text-gray-500"}`}
-              />
-            </Button>
-            <span className="text-sm text-gray-500">{likes}</span>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className={`${categoryColor} border`}>
+                {subcategory}
+              </Badge>
+              <Badge variant="secondary" className={categoryColor}>
+                {type}
+              </Badge>
+              {isWithinLastMonth(created_at) && (
+                <Badge
+                  variant="secondary"
+                  className="bg-green-500/10 text-green-400 border-green-500/20"
+                >
+                  New
+                </Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 hover:bg-gray-700/50 transition-colors"
+                onClick={handleLikeClick}
+              >
+                <Heart
+                  className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : "text-gray-500"}`}
+                />
+              </Button>
+              <span className="text-sm text-gray-500 min-w-[1rem] text-center">
+                {likes}
+              </span>
+            </div>
           </div>
         </CardFooter>
 
         <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
 
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          onClick={handleClick}
+          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-gray-700/50 rounded-full"
+        >
           <ExternalLink className="w-4 h-4 text-gray-400" />
-        </div>
+        </button>
       </Card>
     </TooltipProvider>
   );
