@@ -59,24 +59,47 @@ export async function toggleLike(resourceId: string, userId: string) {
 }
 
 export async function getResources() {
-  const { data, error } = await supabase
-    .from("resources")
-    .select(
-      `
+  const { data: resources, error: resourcesError } = await supabase.from(
+    "resources",
+  ).select(`
       *,
       subcategories (*, 
         categories (*)
       )
-    `,
-    )
-    .order("created_at", { ascending: false });
+    `);
 
-  if (error) {
-    console.error("Error fetching resources:", error);
-    throw error;
+  if (resourcesError) {
+    console.error("Error fetching resources:", resourcesError);
+    throw resourcesError;
   }
-  console.log("Fetched resources:", data);
-  return data;
+
+  // Get likes count for each resource using a more compatible approach
+  const likesMap = new Map();
+
+  // Get all likes
+  const { data: likes, error: likesError } = await supabase
+    .from("likes")
+    .select("resource_id");
+
+  if (likesError) {
+    console.error("Error fetching likes:", likesError);
+    throw likesError;
+  }
+
+  // Count likes for each resource
+  likes?.forEach((like) => {
+    const count = likesMap.get(like.resource_id) || 0;
+    likesMap.set(like.resource_id, count + 1);
+  });
+
+  // Combine resources with their likes count
+  const resourcesWithLikes =
+    resources?.map((resource) => ({
+      ...resource,
+      likes_count: likesMap.get(resource.id) || 0,
+    })) || [];
+
+  return resourcesWithLikes;
 }
 
 export async function getCategories() {

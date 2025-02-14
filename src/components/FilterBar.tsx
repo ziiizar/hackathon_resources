@@ -17,12 +17,14 @@ interface FilterBarProps {
   onSearch?: (query: string) => void;
   onCategoryChange?: (categoryId: string | null) => void;
   onSubcategoryChange?: (subcategoryId: string | null) => void;
+  onSortChange?: (sort: string) => void;
 }
 
 const FilterBar = ({
   onSearch = () => {},
   onCategoryChange = () => {},
   onSubcategoryChange = () => {},
+  onSortChange = () => {},
 }: FilterBarProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -104,6 +106,16 @@ const FilterBar = ({
               {subcategory.name}
             </SelectItem>
           ))}
+        </SelectContent>
+      </Select>
+
+      <Select onValueChange={onSortChange} defaultValue="recent">
+        <SelectTrigger className="w-[200px]">
+          <SelectValue placeholder="Sort by" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="recent">Recently Added</SelectItem>
+          <SelectItem value="likes">Most Liked</SelectItem>
         </SelectContent>
       </Select>
     </div>

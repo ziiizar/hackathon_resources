@@ -9,12 +9,14 @@ interface ResourceGridProps {
   selectedCategory?: string | null;
   selectedSubcategory?: string | null;
   searchQuery?: string;
+  sortBy?: string;
 }
 
 const ResourceGrid = ({
   selectedCategory = null,
   selectedSubcategory = null,
   searchQuery = "",
+  sortBy = "recent",
 }: ResourceGridProps) => {
   const [resources, setResources] = useState<ResourceWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +61,26 @@ const ResourceGrid = ({
     return categoryMatch && subcategoryMatch && searchMatch;
   });
 
-  const visibleResources = filteredResources;
+  const sortedResources = [...filteredResources].sort((a, b) => {
+    if (sortBy === "recent") {
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+      const aIsRecent = new Date(a.created_at) > oneMonthAgo;
+      const bIsRecent = new Date(b.created_at) > oneMonthAgo;
+
+      if (aIsRecent && !bIsRecent) return -1;
+      if (!aIsRecent && bIsRecent) return 1;
+      return (
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    } else if (sortBy === "likes") {
+      return (b.likes_count || 0) - (a.likes_count || 0);
+    }
+    return 0;
+  });
+
+  const visibleResources = sortedResources;
 
   if (loading) {
     return <div className="p-8 text-center">Loading resources...</div>;
@@ -89,6 +110,7 @@ const ResourceGrid = ({
                   subcategory={resource.subcategories?.name}
                   isPaid={resource.is_paid}
                   url={resource.url}
+                  created_at={resource.created_at}
                 />
               ))}
             </div>

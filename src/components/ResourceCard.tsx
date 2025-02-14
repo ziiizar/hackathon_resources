@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { Badge } from "./ui/badge";
+import { isWithinLastMonth } from "@/lib/utils";
 import { Button } from "./ui/button";
 import {
   Tooltip,
@@ -73,6 +74,7 @@ export const ResourceCard = ({
   isPaid = false,
   url = "#",
   id = "",
+  created_at = new Date().toISOString(),
 }: ResourceCardProps) => {
   const [likes, setLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -163,9 +165,19 @@ export const ResourceCard = ({
               <div className={`p-1.5 rounded ${categoryColor}`}>
                 <Icon className="w-4 h-4" />
               </div>
-              <h3 className="text-base font-medium text-white line-clamp-1">
-                {title}
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-medium text-white line-clamp-1">
+                  {title}
+                </h3>
+                {isWithinLastMonth(created_at) && (
+                  <Badge
+                    variant="secondary"
+                    className="bg-green-500/10 text-green-400 border-green-500/20"
+                  >
+                    New
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
         </CardHeader>

@@ -9,6 +9,7 @@ const Resources = () => {
     null,
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("recent");
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -23,6 +24,10 @@ const Resources = () => {
     setSelectedSubcategory(subcategoryId);
   };
 
+  const handleSortChange = (sort: string) => {
+    setSortBy(sort);
+  };
+
   return (
     <div className="min-h-screen bg-[#0B1121]">
       <Header onSearch={handleSearch} />
@@ -31,11 +36,13 @@ const Resources = () => {
           onSearch={handleSearch}
           onCategoryChange={handleCategoryChange}
           onSubcategoryChange={handleSubcategoryChange}
+          onSortChange={handleSortChange}
         />
         <ResourceGrid
           selectedCategory={selectedCategory}
           selectedSubcategory={selectedSubcategory}
           searchQuery={searchQuery}
+          sortBy={sortBy}
         />
       </main>
     </div>
