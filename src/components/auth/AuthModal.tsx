@@ -53,7 +53,7 @@ export function AuthModal({ open = true, onOpenChange }: AuthModalProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Welcome to Dev Resources</DialogTitle>
+          <DialogTitle>Welcome to ToolForge</DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="signin" className="w-full">
           <TabsList className="grid w-full grid-cols-2">

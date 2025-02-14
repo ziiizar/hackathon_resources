@@ -79,7 +79,7 @@ const Header = ({ onSearch = () => {} }: HeaderProps) => {
             to="/"
             className="text-xl font-bold hover:opacity-80 transition-opacity"
           >
-            DevHub
+            ToolForge
           </Link>
           <Navigation />
         </div>

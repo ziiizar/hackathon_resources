@@ -9,7 +9,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto py-12 px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Dev Resources</h3>
+            <h3 className="text-lg font-semibold">ToolForge</h3>
             <p className="text-sm text-muted-foreground">
               Your gateway to development excellence. Curated resources for
               developers at every level.
@@ -128,7 +128,7 @@ const Footer = () => {
 
         <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © {year} Dev Resources. All rights reserved.
+            © {year} ToolForge. All rights reserved.
           </p>
           <div className="flex gap-4">
             <a
