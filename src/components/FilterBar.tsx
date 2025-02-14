@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Input } from "./ui/input";
-import { Search } from "lucide-react";
+import { Search, Heart } from "lucide-react";
 import { getCategories } from "@/lib/api";
 import type { Category } from "@/lib/api";
 
@@ -18,6 +18,8 @@ interface FilterBarProps {
   onCategoryChange?: (categoryId: string | null) => void;
   onSubcategoryChange?: (subcategoryId: string | null) => void;
   onSortChange?: (sort: string) => void;
+  showFavorites?: boolean;
+  onFavoritesChange?: (showFavorites: boolean) => void;
 }
 
 const FilterBar = ({
@@ -25,6 +27,8 @@ const FilterBar = ({
   onCategoryChange = () => {},
   onSubcategoryChange = () => {},
   onSortChange = () => {},
+  showFavorites = false,
+  onFavoritesChange = () => {},
 }: FilterBarProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -118,6 +122,15 @@ const FilterBar = ({
           <SelectItem value="likes">Most Liked</SelectItem>
         </SelectContent>
       </Select>
+
+      <Button
+        variant={showFavorites ? "default" : "outline"}
+        size="icon"
+        onClick={() => onFavoritesChange(!showFavorites)}
+        className={`transition-colors ${showFavorites ? "bg-violet-600 hover:bg-violet-700" : "hover:text-violet-500"}`}
+      >
+        <Heart className={`h-4 w-4 ${showFavorites ? "fill-current" : ""}`} />
+      </Button>
     </div>
   );
 };

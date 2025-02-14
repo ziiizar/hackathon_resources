@@ -10,6 +10,7 @@ const Resources = () => {
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("recent");
+  const [showFavorites, setShowFavorites] = useState(false);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -37,12 +38,15 @@ const Resources = () => {
           onCategoryChange={handleCategoryChange}
           onSubcategoryChange={handleSubcategoryChange}
           onSortChange={handleSortChange}
+          showFavorites={showFavorites}
+          onFavoritesChange={setShowFavorites}
         />
         <ResourceGrid
           selectedCategory={selectedCategory}
           selectedSubcategory={selectedSubcategory}
           searchQuery={searchQuery}
           sortBy={sortBy}
+          showFavorites={showFavorites}
         />
       </main>
     </div>

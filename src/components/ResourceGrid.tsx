@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { ResourceCard } from "./ResourceCard";
 import { getResources } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/components/auth/AuthContext";
 import type { ResourceWithRelations } from "@/lib/data";
-import { ChevronDown } from "lucide-react";
-import { Button } from "./ui/button";
 
 interface ResourceGridProps {
   selectedCategory?: string | null;
   selectedSubcategory?: string | null;
   searchQuery?: string;
   sortBy?: string;
+  showFavorites?: boolean;
 }
 
 const ResourceGrid = ({
@@ -17,10 +18,32 @@ const ResourceGrid = ({
   selectedSubcategory = null,
   searchQuery = "",
   sortBy = "recent",
+  showFavorites = false,
 }: ResourceGridProps) => {
+  const { user } = useAuth();
   const [resources, setResources] = useState<ResourceWithRelations[]>([]);
+  const [likedResources, setLikedResources] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadLikedResources = async () => {
+      const { data: likes } = await supabase
+        .from("likes")
+        .select("resource_id")
+        .eq("user_id", user?.id || "");
+
+      if (likes) {
+        setLikedResources(new Set(likes.map((like) => like.resource_id)));
+      }
+    };
+
+    if (user) {
+      loadLikedResources();
+    } else {
+      setLikedResources(new Set());
+    }
+  }, [user]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -58,7 +81,9 @@ const ResourceGrid = ({
         searchQuery.toLowerCase(),
       );
 
-    return categoryMatch && subcategoryMatch && searchMatch;
+    const favoriteMatch = !showFavorites || likedResources.has(resource.id);
+
+    return categoryMatch && subcategoryMatch && searchMatch && favoriteMatch;
   });
 
   const sortedResources = [...filteredResources].sort((a, b) => {
