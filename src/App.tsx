@@ -4,6 +4,7 @@ import Resources from "./components/Resources";
 import About from "./components/About";
 import Contact from "./components/Contact";
 import routes from "tempo-routes";
+import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         {/* Add this before the catchall route */}
         {import.meta.env.VITE_TEMPO === "true" && <Route path="/tempobook/*" />}
       </Routes>
+      <Analytics />
     </>
   );
 }
