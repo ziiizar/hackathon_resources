@@ -203,7 +203,7 @@ export const ResourceCard = ({
                   className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : "text-gray-500"}`}
                 />
               </Button>
-              <span className="text-sm text-gray-500 min-w-[1rem] text-center">
+              <span className="text-sm text-gray-500 min-w-[1rem] text-start">
                 {likes}
               </span>
             </div>
