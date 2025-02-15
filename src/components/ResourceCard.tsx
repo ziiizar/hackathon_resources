@@ -16,8 +16,9 @@ import {
   Wrench,
   ExternalLink,
   Heart,
+  Star,
 } from "lucide-react";
-import { useAuth } from "@/components/auth/AuthContext";
+import { useAuth } from "@/components/auth";
 import { useEffect, useState } from "react";
 import { getLikes, toggleLike } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
@@ -35,6 +36,7 @@ interface ResourceCardProps {
   isPaid?: boolean;
   url?: string;
   created_at?: string;
+  is_affiliate?: boolean;
 }
 
 const getIconByType = (type: ResourceType) => {
@@ -76,6 +78,7 @@ export const ResourceCard = ({
   url = "#",
   id = "",
   created_at = new Date().toISOString(),
+  is_affiliate = false,
 }: ResourceCardProps) => {
   const [likes, setLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -156,8 +159,15 @@ export const ResourceCard = ({
 
   return (
     <TooltipProvider>
-      <Card className="group relative flex flex-col h-[140px] bg-[#0F172A] hover:bg-[#1E293B] transition-all duration-300 border border-gray-800/50 hover:border-violet-500/30">
-        <CardHeader className="pb-1 pt-3 flex-none">
+      <Card
+        className={`group relative flex flex-col h-[140px] transition-all duration-300 ${is_affiliate ? "bg-gradient-to-br from-yellow-500/20 via-amber-500/10 to-yellow-500/5 hover:from-yellow-500/30 hover:via-amber-500/20 hover:to-yellow-500/10 border-2 border-yellow-500/50 shadow-lg shadow-yellow-500/20" : "bg-[#0F172A] hover:bg-[#1E293B] border border-gray-800/50 hover:border-violet-500/30"}`}
+      >
+        <CardHeader className="pb-1 pt-3 flex-none relative">
+          {is_affiliate && (
+            <div className="absolute -top-3 -right-3 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-full p-1.5 shadow-lg transform rotate-12">
+              <Star className="w-4 h-4 text-white" />
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className={`p-1.5 rounded ${categoryColor}`}>

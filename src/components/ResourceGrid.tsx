@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ResourceCard } from "./ResourceCard";
 import { getResources } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/components/auth/AuthContext";
+import { useAuth } from "@/components/auth";
 import type { ResourceWithRelations } from "@/lib/data";
 
 interface ResourceGridProps {
@@ -136,6 +136,7 @@ const ResourceGrid = ({
                   isPaid={resource.is_paid}
                   url={resource.url}
                   created_at={resource.created_at}
+                  is_affiliate={resource.is_affiliate}
                 />
               ))}
             </div>
