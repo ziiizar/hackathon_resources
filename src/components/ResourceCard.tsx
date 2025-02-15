@@ -16,7 +16,6 @@ import {
   Wrench,
   ExternalLink,
   Heart,
-  Star,
 } from "lucide-react";
 import { useAuth } from "@/components/auth";
 import { useEffect, useState } from "react";
@@ -160,13 +159,13 @@ export const ResourceCard = ({
   return (
     <TooltipProvider>
       <Card
-        className={`group relative flex flex-col h-[140px] transition-all duration-300 ${is_affiliate ? "bg-gradient-to-br from-yellow-500/20 via-amber-500/10 to-yellow-500/5 hover:from-yellow-500/30 hover:via-amber-500/20 hover:to-yellow-500/10 border-2 border-yellow-500/50 shadow-lg shadow-yellow-500/20" : "bg-[#0F172A] hover:bg-[#1E293B] border border-gray-800/50 hover:border-violet-500/30"}`}
+        className={`group relative flex flex-col h-[140px] transition-all duration-300 ${is_affiliate ? "bg-gradient-to-r from-violet-500/10 to-violet-400/5 hover:from-violet-500/20 hover:to-violet-400/10 border-2 border-violet-500/50 shadow-lg shadow-violet-500/20" : "bg-[#0F172A] hover:bg-[#1E293B] border border-gray-800/50 hover:border-violet-500/30"}`}
       >
         <CardHeader className="pb-1 pt-3 flex-none relative">
           {is_affiliate && (
-            <div className="absolute -top-3 -right-3 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-full p-1.5 shadow-lg transform rotate-12">
-              <Star className="w-4 h-4 text-white" />
-            </div>
+            <Badge className="absolute -top-2 -right-2 bg-violet-500 text-white border-none shadow-lg">
+              Featured
+            </Badge>
           )}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
