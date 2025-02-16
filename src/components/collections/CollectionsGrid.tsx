@@ -130,7 +130,10 @@ export function CollectionsGrid({ userId }: CollectionsGridProps) {
         {collections.map((collection) => (
           <CollectionCard
             key={collection.id}
-            {...collection}
+            id={collection.id}
+            name={collection.name}
+            description={collection.description}
+            isPublic={collection.is_public}
             resourceCount={collection.resource_count}
             onDelete={() => setDeleteId(collection.id)}
           />
