@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { CollectionCard } from "./CollectionCard";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
 import { CreateCollectionDialog } from "./CreateCollectionDialog";
 import { useToast } from "../ui/use-toast";
 import {
@@ -101,7 +102,19 @@ export function CollectionsGrid({ userId }: CollectionsGridProps) {
   };
 
   if (loading) {
-    return <div>Loading collections...</div>;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-[140px] w-full" />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (

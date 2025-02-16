@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import Header from "../Header";
 import { Card, CardHeader } from "../ui/card";
 import { Globe, Lock } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
 import { ResourceCard } from "../ResourceCard";
 import type { ResourceWithRelations } from "@/lib/data";
 
@@ -61,7 +62,31 @@ const CollectionDetail = () => {
   }, [id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="pt-[72px] px-6">
+          <div className="max-w-6xl mx-auto py-12">
+            <Card className="mb-8">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <Skeleton className="h-8 w-64" />
+                    <Skeleton className="h-4 w-96" />
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <Skeleton key={i} className="h-[140px] w-full" />
+              ))}
+            </div>
+          </div>
+        </main>
+      </div>
+    );
   }
 
   if (!collection) {
