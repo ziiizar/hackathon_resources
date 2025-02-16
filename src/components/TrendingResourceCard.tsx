@@ -70,7 +70,7 @@ export function TrendingResourceCard({
 
   return (
     <Card
-      className="group relative overflow-hidden bg-gradient-to-br from-[#1a1f35] to-[#111827] border-0 h-[400px] cursor-pointer transition-all duration-500 hover:shadow-2xl hover:shadow-violet-500/10"
+      className="group relative overflow-hidden bg-gradient-to-br from-[#1a1f35] to-[#111827] border-0 h-[400px] cursor-pointer transition-all duration-700 hover:shadow-2xl hover:shadow-violet-500/10"
       onClick={handleClick}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent z-10" />
@@ -89,7 +89,10 @@ export function TrendingResourceCard({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{
+            duration: 0.8,
+            ease: [0.4, 0, 0.2, 1],
+          }}
           className="space-y-4"
         >
           <div className="space-y-2">

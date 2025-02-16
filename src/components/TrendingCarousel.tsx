@@ -10,6 +10,7 @@ import { TrendingResourceCard } from "./TrendingResourceCard";
 import { getResources } from "@/lib/api";
 import type { ResourceWithRelations } from "@/lib/data";
 import { Skeleton } from "./ui/skeleton";
+import AutoplayPlugin from "embla-carousel-autoplay";
 
 export function TrendingCarousel() {
   const [resources, setResources] = useState<ResourceWithRelations[]>([]);
@@ -34,8 +35,8 @@ export function TrendingCarousel() {
     return (
       <div className="w-full max-w-6xl mx-auto px-6">
         <div className="flex gap-6 overflow-hidden">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="w-[380px] h-[140px] flex-shrink-0" />
+          {[1, 2].map((i) => (
+            <Skeleton key={i} className="w-[600px] h-[400px] flex-shrink-0" />
           ))}
         </div>
       </div>
@@ -51,7 +52,17 @@ export function TrendingCarousel() {
       opts={{
         align: "start",
         loop: true,
+        dragFree: true,
+        skipSnaps: false,
+        inViewThreshold: 0.7,
       }}
+      plugins={[
+        AutoplayPlugin({
+          delay: 5000,
+          stopOnInteraction: false,
+          stopOnMouseEnter: true,
+        }),
+      ]}
       className="w-full max-w-6xl mx-auto px-6"
     >
       <CarouselContent>
@@ -71,8 +82,8 @@ export function TrendingCarousel() {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
+      <CarouselPrevious className="-left-12 bg-white/5 hover:bg-white/10 border-0" />
+      <CarouselNext className="-right-12 bg-white/5 hover:bg-white/10 border-0" />
     </Carousel>
   );
 }
