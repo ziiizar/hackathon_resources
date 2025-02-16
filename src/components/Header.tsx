@@ -107,6 +107,11 @@ const Header = ({ onSearch = () => {} }: HeaderProps) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => (window.location.href = `/profile/${user.id}`)}
+                >
+                  Profile
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => signOut()}>
                   Sign Out
                 </DropdownMenuItem>
