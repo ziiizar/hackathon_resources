@@ -71,20 +71,40 @@ export async function toggleLike(resourceId: string, userId: string) {
   }
 }
 
-export async function getResources(options: { trending?: boolean } = {}) {
-  const query = supabase.from(
-    options.trending ? "trending_resources" : "resources",
-  ).select(`
-      *,
-      subcategories (*, 
-        categories (*)
-      )
-    `);
+export async function getResources(
+  options: {
+    trending?: boolean;
+    sortBy?: "recent" | "likes" | "relevance" | "trending_week";
+  } = {},
+) {
+  let query = supabase.from("resources").select(`
+    *,
+    subcategories (*, 
+      categories (*)
+    ),
+    views:resource_views(count),
+    likes:likes(count)
+  `);
 
-  if (options.trending) {
-    query.order("trending_score", { ascending: false }).limit(10);
+  if (options.sortBy === "trending_week") {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    query = query
+      .select(
+        `
+        *,
+        subcategories (*, 
+          categories (*)
+        ),
+        views:resource_views(count),
+        likes:likes(count)
+      `,
+      )
+      .gte("created_at", oneWeekAgo.toISOString());
   }
 
+  // Get the data
   const { data: resources, error: resourcesError } = await query;
 
   if (resourcesError) {
@@ -92,33 +112,42 @@ export async function getResources(options: { trending?: boolean } = {}) {
     throw resourcesError;
   }
 
-  // Get likes count for each resource using a more compatible approach
-  const likesMap = new Map();
+  // Calculate scores and sort
+  const resourcesWithScores =
+    resources?.map((resource) => {
+      const viewCount = resource.views?.[0]?.count || 0;
+      const likeCount = resource.likes?.[0]?.count || 0;
 
-  // Get all likes
-  const { data: likes, error: likesError } = await supabase
-    .from("likes")
-    .select("resource_id");
+      return {
+        ...resource,
+        relevance_score: viewCount + likeCount,
+        trending_score:
+          options.sortBy === "trending_week" ? viewCount + likeCount : 0,
+      };
+    }) || [];
 
-  if (likesError) {
-    console.error("Error fetching likes:", likesError);
-    throw likesError;
+  // Sort based on option
+  switch (options.sortBy) {
+    case "likes":
+      resourcesWithScores.sort(
+        (a, b) => (b.likes?.[0]?.count || 0) - (a.likes?.[0]?.count || 0),
+      );
+      break;
+    case "relevance":
+      resourcesWithScores.sort((a, b) => b.relevance_score - a.relevance_score);
+      break;
+    case "trending_week":
+      resourcesWithScores.sort((a, b) => b.trending_score - a.trending_score);
+      break;
+    default:
+      // Default to recent
+      resourcesWithScores.sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      );
   }
 
-  // Count likes for each resource
-  likes?.forEach((like) => {
-    const count = likesMap.get(like.resource_id) || 0;
-    likesMap.set(like.resource_id, count + 1);
-  });
-
-  // Combine resources with their likes count
-  const resourcesWithLikes =
-    resources?.map((resource) => ({
-      ...resource,
-      likes_count: likesMap.get(resource.id) || 0,
-    })) || [];
-
-  return resourcesWithLikes;
+  return resourcesWithScores;
 }
 
 export async function getCategories() {

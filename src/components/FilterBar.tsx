@@ -120,6 +120,7 @@ const FilterBar = ({
         <SelectContent>
           <SelectItem value="recent">Recently Added</SelectItem>
           <SelectItem value="likes">Most Liked</SelectItem>
+          <SelectItem value="relevance">Most Relevant</SelectItem>
         </SelectContent>
       </Select>
 

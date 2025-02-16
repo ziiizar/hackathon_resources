@@ -9,7 +9,7 @@ interface ResourceGridProps {
   selectedCategory?: string | null;
   selectedSubcategory?: string | null;
   searchQuery?: string;
-  sortBy?: string;
+  sortBy?: "recent" | "likes" | "relevance" | "trending_week";
   showFavorites?: boolean;
 }
 
@@ -51,7 +51,7 @@ const ResourceGrid = ({
         setLoading(true);
 
         // Cargar recursos
-        const data = await getResources();
+        const data = await getResources({ sortBy });
         console.log("Resources:", data);
         setResources(data || []);
       } catch (e) {
@@ -63,7 +63,7 @@ const ResourceGrid = ({
     };
 
     loadData();
-  }, []);
+  }, [sortBy]);
 
   const filteredResources = resources.filter((resource) => {
     const categoryMatch =
