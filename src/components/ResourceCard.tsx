@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/auth";
 import { useEffect, useState } from "react";
-import { getLikes, toggleLike } from "@/lib/api";
+import { getLikes, toggleLike, recordView } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "./ui/use-toast";
 import { AuthModal } from "./auth/AuthModal";
@@ -154,7 +154,10 @@ export const ResourceCard = ({
   const Icon = getIconByType(type);
   const categoryColor = getCategoryColor(type);
 
-  const handleClick = () => {
+  const handleClick = async () => {
+    if (user?.id) {
+      await recordView(id, user.id);
+    }
     window.open(url, "_blank", "noopener,noreferrer");
   };
 

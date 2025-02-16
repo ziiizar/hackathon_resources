@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Header from "./Header";
+import { TrendingCarousel } from "./TrendingCarousel";
 import HeroSection from "./HeroSection";
 import FeaturesSection from "./FeaturesSection";
 import SupportSection from "./ProMembershipSection";
@@ -42,6 +43,19 @@ const Home = () => {
       <Header onSearch={handleSearch} />
       <main className="">
         <HeroSection />
+        <div className="bg-[#0B1121] py-24">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center space-y-4 mb-12 px-6">
+              <h2 className="text-4xl font-bold text-white">
+                Trending Resources
+              </h2>
+              <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                Discover the most popular development resources this week
+              </p>
+            </div>
+            <TrendingCarousel />
+          </div>
+        </div>
         <AffiliateSection />
         <FeaturesSection />
         <SupportSection />

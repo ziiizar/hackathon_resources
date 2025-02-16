@@ -26,6 +26,19 @@ export async function getLikes(resourceId: string) {
   return count || 0;
 }
 
+export async function recordView(resourceId: string, userId: string) {
+  if (!resourceId || !userId) return;
+
+  try {
+    await supabase.from("resource_views").insert({
+      resource_id: resourceId,
+      user_id: userId,
+    });
+  } catch (error) {
+    console.error("Error recording view:", error);
+  }
+}
+
 export async function toggleLike(resourceId: string, userId: string) {
   if (!resourceId || !userId) return false; // Return false if either id is missing
   // First check if the like exists
@@ -58,15 +71,21 @@ export async function toggleLike(resourceId: string, userId: string) {
   }
 }
 
-export async function getResources() {
-  const { data: resources, error: resourcesError } = await supabase.from(
-    "resources",
+export async function getResources(options: { trending?: boolean } = {}) {
+  const query = supabase.from(
+    options.trending ? "trending_resources" : "resources",
   ).select(`
       *,
       subcategories (*, 
         categories (*)
       )
     `);
+
+  if (options.trending) {
+    query.order("trending_score", { ascending: false }).limit(10);
+  }
+
+  const { data: resources, error: resourcesError } = await query;
 
   if (resourcesError) {
     console.error("Error fetching resources:", resourcesError);
