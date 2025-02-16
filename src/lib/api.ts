@@ -90,7 +90,8 @@ export async function getResources(
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-    query = query
+    const { data: weekData, error: weekError } = await supabase
+      .from("resources")
       .select(
         `
         *,
@@ -101,7 +102,10 @@ export async function getResources(
         likes:likes(count)
       `,
       )
-      .gte("created_at", oneWeekAgo.toISOString());
+      .filter("created_at", "gte", oneWeekAgo.toISOString());
+
+    if (weekError) throw weekError;
+    return weekData || [];
   }
 
   // Get the data

@@ -11,7 +11,6 @@ export interface ResourceWithRelations {
   is_paid: boolean;
   created_at: string;
   updated_at: string;
-  likes_count?: number;
   is_affiliate?: boolean;
   subcategories: {
     id: string;

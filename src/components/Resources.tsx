@@ -9,7 +9,9 @@ const Resources = () => {
     null,
   );
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("recent");
+  const [sortBy, setSortBy] = useState<
+    "recent" | "likes" | "relevance" | "trending_week"
+  >("recent");
   const [showFavorites, setShowFavorites] = useState(false);
 
   const handleSearch = (query: string) => {
@@ -25,7 +27,9 @@ const Resources = () => {
     setSelectedSubcategory(subcategoryId);
   };
 
-  const handleSortChange = (sort: string) => {
+  const handleSortChange = (
+    sort: "recent" | "likes" | "relevance" | "trending_week",
+  ) => {
     setSortBy(sort);
   };
 
