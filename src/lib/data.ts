@@ -1,6 +1,8 @@
 export type ResourceType = "Frontend" | "Design" | "AI Agents" | "AI Chats";
 
 export interface ResourceWithRelations {
+  trending_score?: number;
+  likes_count?: number;
   id: string;
   subcategory_id: string;
   title: string;

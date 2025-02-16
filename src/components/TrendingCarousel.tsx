@@ -10,7 +10,8 @@ import { TrendingResourceCard } from "./TrendingResourceCard";
 import { getResources } from "@/lib/api";
 import type { ResourceWithRelations } from "@/lib/data";
 import { Skeleton } from "./ui/skeleton";
-import AutoplayPlugin from "embla-carousel-autoplay";
+import AutoplayPlugin, { AutoplayType } from "embla-carousel-autoplay";
+import type { CreatePluginType, LoosePluginType } from "@embla-carousel/core";
 
 export function TrendingCarousel() {
   const [resources, setResources] = useState<ResourceWithRelations[]>([]);
@@ -57,7 +58,7 @@ export function TrendingCarousel() {
         inViewThreshold: 0.7,
       }}
       plugins={[
-        AutoplayPlugin({
+        (AutoplayPlugin as unknown as CreatePluginType<LoosePluginType, {}>)({
           delay: 5000,
           stopOnInteraction: false,
           stopOnMouseEnter: true,
