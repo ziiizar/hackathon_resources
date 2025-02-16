@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { isWithinLastMonth } from "@/lib/utils";
 import { Button } from "./ui/button";
+import { AddToCollectionDialog } from "./collections/AddToCollectionDialog";
 import {
   Tooltip,
   TooltipContent,
@@ -82,6 +83,7 @@ export const ResourceCard = ({
   const [likes, setLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showCollectionDialog, setShowCollectionDialog] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -202,24 +204,46 @@ export const ResourceCard = ({
               )}
             </div>
             <div className="flex items-center gap-1.5">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 hover:bg-gray-700/50 transition-colors"
-                onClick={handleLikeClick}
-              >
-                <Heart
-                  className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : "text-gray-500"}`}
-                />
-              </Button>
-              <span className="text-sm text-gray-500 min-w-[1rem] text-start">
-                {likes}
-              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 hover:bg-gray-700/50 transition-colors"
+                  onClick={handleLikeClick}
+                >
+                  <Heart
+                    className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : "text-gray-500"}`}
+                  />
+                </Button>
+                <span className="text-sm text-gray-500 min-w-[1rem] text-start">
+                  {likes}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-sm text-gray-500 hover:text-gray-400"
+                  onClick={() =>
+                    user
+                      ? setShowCollectionDialog(true)
+                      : setShowAuthModal(true)
+                  }
+                >
+                  Save
+                </Button>
+              </div>
             </div>
           </div>
         </CardFooter>
 
         <AuthModal open={showAuthModal} onOpenChange={setShowAuthModal} />
+        {user && (
+          <AddToCollectionDialog
+            open={showCollectionDialog}
+            onOpenChange={setShowCollectionDialog}
+            resourceId={id}
+            userId={user.id}
+          />
+        )}
 
         <button
           onClick={handleClick}

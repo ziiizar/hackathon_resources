@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Heart, Settings, Crown } from "lucide-react";
+import { CollectionsGrid } from "../collections/CollectionsGrid";
 
 interface UserProfile {
   id: string;
@@ -106,11 +107,13 @@ const ProfilePage = () => {
                 )}
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
               <div className="flex items-center gap-2">
                 <Heart className="h-4 w-4 text-red-500" />
                 <span>{profile.likes_count} resources liked</span>
               </div>
+
+              <CollectionsGrid userId={profile.id} />
             </CardContent>
           </Card>
         </div>
