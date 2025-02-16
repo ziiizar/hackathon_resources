@@ -11,7 +11,8 @@ import { getResources } from "@/lib/api";
 import type { ResourceWithRelations } from "@/lib/data";
 import { Skeleton } from "./ui/skeleton";
 import AutoplayPlugin, { AutoplayType } from "embla-carousel-autoplay";
-import type { CreatePluginType, LoosePluginType } from "@embla-carousel/core";
+type CreatePluginType<T, U> = any;
+type LoosePluginType = any;
 
 export function TrendingCarousel() {
   const [resources, setResources] = useState<ResourceWithRelations[]>([]);

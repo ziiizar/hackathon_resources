@@ -74,7 +74,7 @@ export async function toggleLike(resourceId: string, userId: string) {
 export async function getResources(
   options: {
     trending?: boolean;
-    sortBy?: "recent" | "likes" | "relevance" | "trending_week";
+    sortBy?: "recent" | "likes" | "relevance";
   } = {},
 ) {
   let query = supabase.from("resources").select(`
@@ -85,28 +85,6 @@ export async function getResources(
     views:resource_views(count),
     likes:likes(count)
   `);
-
-  if (options.sortBy === "trending_week") {
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-    const { data: weekData, error: weekError } = await supabase
-      .from("resources")
-      .select(
-        `
-        *,
-        subcategories (*, 
-          categories (*)
-        ),
-        views:resource_views(count),
-        likes:likes(count)
-      `,
-      )
-      .filter("created_at", "gte", oneWeekAgo.toISOString());
-
-    if (weekError) throw weekError;
-    return weekData || [];
-  }
 
   // Get the data
   const { data: resources, error: resourcesError } = await query;
@@ -125,8 +103,8 @@ export async function getResources(
       return {
         ...resource,
         relevance_score: viewCount + likeCount,
-        trending_score:
-          options.sortBy === "trending_week" ? viewCount + likeCount : 0,
+        trending_score: viewCount + likeCount,
+        likes_count: likeCount,
       };
     }) || [];
 
@@ -139,9 +117,6 @@ export async function getResources(
       break;
     case "relevance":
       resourcesWithScores.sort((a, b) => b.relevance_score - a.relevance_score);
-      break;
-    case "trending_week":
-      resourcesWithScores.sort((a, b) => b.trending_score - a.trending_score);
       break;
     default:
       // Default to recent

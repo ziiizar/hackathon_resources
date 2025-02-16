@@ -17,7 +17,7 @@ interface FilterBarProps {
   onSearch?: (query: string) => void;
   onCategoryChange?: (categoryId: string | null) => void;
   onSubcategoryChange?: (subcategoryId: string | null) => void;
-  onSortChange?: (sort: string) => void;
+  onSortChange?: (sort: "recent" | "likes" | "relevance") => void;
   showFavorites?: boolean;
   onFavoritesChange?: (showFavorites: boolean) => void;
 }
