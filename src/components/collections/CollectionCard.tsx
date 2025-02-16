@@ -18,6 +18,8 @@ interface CollectionCardProps {
   onDelete?: () => void;
 }
 
+import { useNavigate } from "react-router-dom";
+
 export function CollectionCard({
   id,
   name,
@@ -27,8 +29,12 @@ export function CollectionCard({
   onEdit,
   onDelete,
 }: CollectionCardProps) {
+  const navigate = useNavigate();
   return (
-    <Card className="group hover:border-primary/50 transition-colors">
+    <Card
+      className="group hover:border-primary/50 transition-colors cursor-pointer"
+      onClick={() => navigate(`/collection/${id}`)}
+    >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
           <h3 className="font-semibold leading-none tracking-tight">{name}</h3>
