@@ -9,7 +9,7 @@ interface ResourceGridProps {
   selectedCategory?: string | null;
   selectedSubcategory?: string | null;
   searchQuery?: string;
-  sortBy?: "recent" | "likes" | "relevance" | "trending_week";
+  sortBy?: "recent" | "likes" | "relevance";
   showFavorites?: boolean;
 }
 
