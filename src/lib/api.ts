@@ -75,6 +75,11 @@ export async function getResources(
   options: {
     trending?: boolean;
     sortBy?: "recent" | "likes" | "relevance";
+    page?: number;
+    limit?: number;
+    categoryId?: string | null;
+    subcategoryId?: string | null;
+    searchQuery?: string;
   } = {},
 ) {
   let query = supabase.from("resources").select(`
@@ -85,6 +90,28 @@ export async function getResources(
     views:resource_views(count),
     likes:likes(count)
   `);
+
+  // Aplicar filtros
+  if (options.categoryId) {
+    query = query.eq("subcategories.category_id", options.categoryId);
+  }
+
+  if (options.subcategoryId) {
+    query = query.eq("subcategory_id", options.subcategoryId);
+  }
+
+  if (options.searchQuery) {
+    query = query.or(
+      `title.ilike.%${options.searchQuery}%,description.ilike.%${options.searchQuery}%,subcategories.name.ilike.%${options.searchQuery}%,subcategories.categories.name.ilike.%${options.searchQuery}%`,
+    );
+  }
+
+  // Aplicar paginación
+  if (options.page && options.limit) {
+    const start = (options.page - 1) * options.limit;
+    const end = start + options.limit - 1;
+    query = query.range(start, end);
+  }
 
   // Get the data
   const { data: resources, error: resourcesError } = await query;
