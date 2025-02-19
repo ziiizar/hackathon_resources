@@ -12,29 +12,40 @@ export type Subcategory =
   };
 
 export async function getLikes(resourceId: string) {
-  if (!resourceId) return 0; // Return 0 if no resourceId is provided
-  const { count, error } = await supabase
-    .from("likes")
-    .select("*", { count: "exact", head: true })
-    .eq("resource_id", resourceId);
+  if (!resourceId) return 0;
+
+  const { data, error } = await supabase
+    .from("resources")
+    .select("likes_count")
+    .eq("id", resourceId)
+    .single();
 
   if (error) {
     console.error("Error fetching likes:", error);
     throw error;
   }
 
-  return count || 0;
+  return data?.likes_count || 0;
 }
 
 export async function recordView(resourceId: string, userId: string) {
   if (!resourceId || !userId) return;
 
   try {
-    await supabase.from("resource_views").insert({
-      resource_id: resourceId,
-      user_id: userId,
-    });
+    const { error } = await supabase.from("resource_views").upsert(
+      {
+        resource_id: resourceId,
+        user_id: userId,
+      },
+      { onConflict: "resource_id,user_id" },
+    );
+
+    if (error && error.code !== "23505") {
+      // Ignorar errores de duplicados
+      console.error("Error recording view:", error);
+    }
   } catch (error) {
+    // Silenciosamente fallar para no interrumpir la experiencia del usuario
     console.error("Error recording view:", error);
   }
 }
@@ -52,23 +63,39 @@ export async function toggleLike(resourceId: string, userId: string) {
       .maybeSingle();
 
     if (existingLike) {
-      // Unlike: Delete the like
-      const { error } = await supabase
+      // Unlike: Delete the like and decrement counter
+      const { error: deleteError } = await supabase
         .from("likes")
         .delete()
         .eq("resource_id", resourceId)
         .eq("user_id", userId);
 
-      if (error) throw error;
+      if (deleteError) throw deleteError;
+
+      // Update resources counter
+      const { error: updateError } = await supabase.rpc("decrement_likes", {
+        resource_id: resourceId,
+      });
+
+      if (updateError) throw updateError;
+
       return false;
     } else {
-      // Like: Insert new like
-      const { error } = await supabase.from("likes").insert({
+      // Like: Insert new like and increment counter
+      const { error: insertError } = await supabase.from("likes").insert({
         resource_id: resourceId,
         user_id: userId,
       });
 
-      if (error) throw error;
+      if (insertError) throw insertError;
+
+      // Update resources counter
+      const { error: updateError } = await supabase.rpc("increment_likes", {
+        resource_id: resourceId,
+      });
+
+      if (updateError) throw updateError;
+
       return true;
     }
   } catch (error) {
