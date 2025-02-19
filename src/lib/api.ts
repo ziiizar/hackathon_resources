@@ -32,6 +32,7 @@ export async function recordView(resourceId: string, userId: string) {
   if (!resourceId || !userId) return;
 
   try {
+    // Insertar la vista
     const { error } = await supabase.from("resource_views").upsert(
       {
         resource_id: resourceId,
