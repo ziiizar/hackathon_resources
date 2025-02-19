@@ -21,7 +21,7 @@ export function TrendingCarousel() {
   useEffect(() => {
     const loadTrending = async () => {
       try {
-        const data = await getResources({ trending: true });
+        const data = await getResources({ sortBy: "trending", limit: 5 });
         setResources(data || []);
       } catch (error) {
         console.error("Error loading trending resources:", error);

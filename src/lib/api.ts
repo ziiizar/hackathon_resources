@@ -40,41 +40,46 @@ export async function recordView(resourceId: string, userId: string) {
 }
 
 export async function toggleLike(resourceId: string, userId: string) {
-  if (!resourceId || !userId) return false; // Return false if either id is missing
-  // First check if the like exists
-  const { data: existingLike } = await supabase
-    .from("likes")
-    .select("id")
-    .eq("resource_id", resourceId)
-    .eq("user_id", userId)
-    .maybeSingle();
+  if (!resourceId || !userId) return false;
 
-  if (existingLike) {
-    // Unlike
-    const { error } = await supabase
+  try {
+    // First check if the like exists
+    const { data: existingLike } = await supabase
       .from("likes")
-      .delete()
+      .select("id")
       .eq("resource_id", resourceId)
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .maybeSingle();
 
-    if (error) throw error;
-    return false;
-  } else {
-    // Like
-    const { error } = await supabase.from("likes").insert({
-      resource_id: resourceId,
-      user_id: userId,
-    });
+    if (existingLike) {
+      // Unlike: Delete the like
+      const { error } = await supabase
+        .from("likes")
+        .delete()
+        .eq("resource_id", resourceId)
+        .eq("user_id", userId);
 
-    if (error) throw error;
-    return true;
+      if (error) throw error;
+      return false;
+    } else {
+      // Like: Insert new like
+      const { error } = await supabase.from("likes").insert({
+        resource_id: resourceId,
+        user_id: userId,
+      });
+
+      if (error) throw error;
+      return true;
+    }
+  } catch (error) {
+    console.error("Error toggling like:", error);
+    throw error;
   }
 }
 
 export async function getResources(
   options: {
-    trending?: boolean;
-    sortBy?: "recent" | "likes" | "relevance";
+    sortBy?: "recent" | "likes" | "relevance" | "trending";
     page?: number;
     limit?: number;
     categoryId?: string | null;
@@ -86,10 +91,22 @@ export async function getResources(
     *,
     subcategories (*, 
       categories (*)
-    ),
-    views:resource_views(count),
-    likes:likes(count)
+    )
   `);
+
+  // Aplicar ordenamiento primero
+  switch (options.sortBy) {
+    case "likes":
+      query = query.order("likes_count", { ascending: false });
+      break;
+    case "trending":
+    case "relevance":
+      query = query.order("trending_score", { ascending: false });
+      break;
+    default:
+      // Default to recent
+      query = query.order("created_at", { ascending: false });
+  }
 
   // Aplicar filtros
   if (options.categoryId) {
@@ -111,6 +128,8 @@ export async function getResources(
     const start = (options.page - 1) * options.limit;
     const end = start + options.limit - 1;
     query = query.range(start, end);
+  } else if (options.limit) {
+    query = query.limit(options.limit);
   }
 
   // Get the data
@@ -121,39 +140,7 @@ export async function getResources(
     throw resourcesError;
   }
 
-  // Calculate scores and sort
-  const resourcesWithScores =
-    resources?.map((resource) => {
-      const viewCount = resource.views?.[0]?.count || 0;
-      const likeCount = resource.likes?.[0]?.count || 0;
-
-      return {
-        ...resource,
-        relevance_score: viewCount + likeCount,
-        trending_score: viewCount + likeCount,
-        likes_count: likeCount,
-      };
-    }) || [];
-
-  // Sort based on option
-  switch (options.sortBy) {
-    case "likes":
-      resourcesWithScores.sort(
-        (a, b) => (b.likes?.[0]?.count || 0) - (a.likes?.[0]?.count || 0),
-      );
-      break;
-    case "relevance":
-      resourcesWithScores.sort((a, b) => b.relevance_score - a.relevance_score);
-      break;
-    default:
-      // Default to recent
-      resourcesWithScores.sort(
-        (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-      );
-  }
-
-  return resourcesWithScores;
+  return resources || [];
 }
 
 export async function getCategories() {
