@@ -6,7 +6,7 @@ import Navigation from "./Navigation";
 import { AuthModal } from "./auth/AuthModal";
 import { PaymentModal } from "./PaymentModal";
 import { useAuth } from "@/components/auth/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   CommandDialog,
   CommandEmpty,
@@ -27,6 +27,7 @@ interface HeaderProps {
 }
 
 const Header = ({ onSearch = () => {} }: HeaderProps) => {
+  const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -119,7 +120,7 @@ const Header = ({ onSearch = () => {} }: HeaderProps) => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
-                  onClick={() => (window.location.href = `/profile/${user.id}`)}
+                  onClick={() => navigate(`/profile/${user.id}`)}
                 >
                   Profile
                 </DropdownMenuItem>

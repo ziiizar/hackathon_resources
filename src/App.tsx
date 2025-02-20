@@ -20,8 +20,8 @@ function App() {
         <Route path="/resources" element={<Resources />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/profile/:id" element={<ProfilePage />} />
-        <Route path="/collection/:id" element={<CollectionDetail />} />
+        <Route path="profile/:id" element={<ProfilePage />} />
+        <Route path="collection/:id" element={<CollectionDetail />} />
 
         {/* Add this before the catchall route */}
         {import.meta.env.VITE_TEMPO === "true" && <Route path="/tempobook/*" />}
