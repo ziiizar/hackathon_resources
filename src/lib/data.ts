@@ -12,6 +12,8 @@ export interface ResourceWithRelations {
   created_at: string;
   updated_at: string;
   is_affiliate?: boolean;
+  screenshot_url?: string;
+  logo_url?: string;
   subcategories: {
     id: string;
     category_id: string;
