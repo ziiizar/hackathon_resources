@@ -84,6 +84,17 @@ const Header = ({ onSearch = () => {} }: HeaderProps) => {
           <Navigation />
         </div>
 
+        <div className="flex-1 flex items-center justify-center">
+          <a
+            href="https://devcourier.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-yellow-300 hover:text-yellow-200 transition-colors flex items-center gap-2 bg-yellow-500/10 px-3 py-1.5 rounded-full"
+          >
+            🚨 Moving to vercel - Follow us
+          </a>
+        </div>
+
         <div className="flex items-center gap-4">
           <a
             href="https://paypal.me/ErnestoFerrando"
