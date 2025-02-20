@@ -81,10 +81,11 @@ export async function toggleLike(resourceId: string, userId: string) {
       if (deleteError) throw deleteError;
 
       // Update resources counter
-      await supabase
-        .from("resources")
-        .update({ likes_count: supabase.raw("likes_count - 1") })
-        .eq("id", resourceId);
+      const { error: updateError } = await supabase.rpc("decrement_likes", {
+        resource_id: resourceId,
+      });
+
+      if (updateError) throw updateError;
 
       return false;
     } else {
@@ -97,10 +98,11 @@ export async function toggleLike(resourceId: string, userId: string) {
       if (insertError) throw insertError;
 
       // Update resources counter
-      await supabase
-        .from("resources")
-        .update({ likes_count: supabase.raw("likes_count + 1") })
-        .eq("id", resourceId);
+      const { error: updateError } = await supabase.rpc("increment_likes", {
+        resource_id: resourceId,
+      });
+
+      if (updateError) throw updateError;
 
       return true;
     }
