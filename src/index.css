@@ -76,7 +76,7 @@
 }
 
 .background-radial-gradient {
-  background: url("/bg-image.png") center/cover no-repeat;
+  background: url("/bg-gradient.webp") center/cover no-repeat;
 }
 
 @keyframes shimmer {
