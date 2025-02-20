@@ -74,8 +74,8 @@ export function TrendingCarousel() {
               id={resource.id}
               title={resource.title}
               description={resource.description || ""}
-              type={resource.subcategories?.categories?.name}
-              subcategory={resource.subcategories?.name}
+              type={resource.subcategories?.categories?.name || "Unknown"}
+              subcategory={resource.subcategories?.name || "General"}
               isPaid={resource.is_paid}
               url={resource.url}
               likes_count={resource.likes_count || 0}

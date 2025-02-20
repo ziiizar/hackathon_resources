@@ -74,7 +74,7 @@ export function TrendingResourceCard({
 
   return (
     <Card
-      className="group relative overflow-hidden border-0 h-[400px] cursor-pointer transition-all duration-700 hover:shadow-2xl hover:shadow-violet-500/10"
+      className="group relative overflow-hidden border-0 h-[400px] cursor-pointer transition-all duration-700 hover:shadow-2xl hover:shadow-violet-500/10 hover:scale-[1.02] hover:-translate-y-1"
       onClick={handleClick}
     >
       {screenshot_url ? (
@@ -127,18 +127,22 @@ export function TrendingResourceCard({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Badge
-              variant="outline"
-              className="border-violet-500/30 text-violet-300"
-            >
-              {type}
-            </Badge>
-            <Badge
-              variant="outline"
-              className="border-blue-500/30 text-blue-300"
-            >
-              {subcategory}
-            </Badge>
+            {type && (
+              <Badge
+                variant="outline"
+                className="border-violet-500/30 text-violet-300 whitespace-nowrap"
+              >
+                {type}
+              </Badge>
+            )}
+            {subcategory && (
+              <Badge
+                variant="outline"
+                className="border-blue-500/30 text-blue-300 whitespace-nowrap"
+              >
+                {subcategory}
+              </Badge>
+            )}
           </div>
 
           <div className="flex items-center justify-between pt-4">
