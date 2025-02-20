@@ -74,7 +74,10 @@ export function TrendingCarousel() {
               id={resource.id}
               title={resource.title}
               description={resource.description || ""}
-              type={resource.subcategories?.categories?.name || "Unknown"}
+              type={
+                (resource.subcategories?.categories?.name as ResourceType) ||
+                "Frontend"
+              }
               subcategory={resource.subcategories?.name || "General"}
               isPaid={resource.is_paid}
               url={resource.url}

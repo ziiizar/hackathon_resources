@@ -3,8 +3,9 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Heart, ExternalLink, TrendingUp } from "lucide-react";
 import { useAuth } from "@/components/auth";
-import { useState } from "react";
-import { toggleLike, recordView } from "@/lib/api";
+import { useState, useEffect } from "react";
+import { toggleLike, recordView, getLikes } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import { useToast } from "./ui/use-toast";
 import { AuthModal } from "./auth/AuthModal";
 import { motion } from "framer-motion";
@@ -14,7 +15,7 @@ interface TrendingResourceCardProps {
   id: string;
   title: string;
   description: string;
-  type: ResourceType;
+  type: ResourceType | string;
   subcategory: string;
   isPaid: boolean;
   url: string;
@@ -38,8 +39,50 @@ export function TrendingResourceCard({
 }: TrendingResourceCardProps) {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [localLikesCount, setLocalLikesCount] = useState(likes_count);
   const { user } = useAuth();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (!id || !user) return;
+
+    const checkLikeStatus = async () => {
+      try {
+        const { data } = await supabase
+          .from("likes")
+          .select("id")
+          .eq("resource_id", id)
+          .eq("user_id", user.id)
+          .maybeSingle();
+        setIsLiked(!!data);
+      } catch (error) {
+        console.error("Error checking like status:", error);
+      }
+    };
+
+    checkLikeStatus();
+
+    // Subscribe to likes changes
+    const channel = supabase
+      .channel(`likes:${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "likes",
+          filter: `resource_id=eq.${id}`,
+        },
+        () => {
+          getLikes(id).then(setLocalLikesCount).catch(console.error);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id, user]);
 
   const handleLikeClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -48,18 +91,22 @@ export function TrendingResourceCard({
       return;
     }
 
+    // Optimistic update
+    const previousIsLiked = isLiked;
+    const previousLikesCount = localLikesCount;
+    setIsLiked(!isLiked);
+    setLocalLikesCount((prev) => prev + (isLiked ? -1 : 1));
+
     try {
-      const newIsLiked = await toggleLike(id, user.id);
-      setIsLiked(newIsLiked);
-      toast({
-        title: newIsLiked ? "Resource liked!" : "Resource unliked",
-        duration: 1500,
-      });
+      await toggleLike(id, user.id);
     } catch (error) {
+      // Revert optimistic update on error
+      setIsLiked(previousIsLiked);
+      setLocalLikesCount(previousLikesCount);
       console.error("Error toggling like:", error);
       toast({
         title: "Error",
-        description: "Could not update like status",
+        description: "Could not update like status. Please try again.",
         variant: "destructive",
       });
     }
@@ -156,7 +203,7 @@ export function TrendingResourceCard({
                 <Heart
                   className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : "text-gray-400"}`}
                 />
-                <span className="text-gray-400">{likes_count}</span>
+                <span className="text-gray-400">{localLikesCount}</span>
               </Button>
             </div>
           </div>
