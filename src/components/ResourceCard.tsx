@@ -17,8 +17,9 @@ import {
   Wrench,
   ExternalLink,
   Heart,
-  Bookmark,
-  BookmarkCheck,
+  Plus,
+  ListPlus,
+  Check,
 } from "lucide-react";
 import { useAuth } from "@/components/auth";
 import { useEffect, useState } from "react";
@@ -84,14 +85,16 @@ export const ResourceCard = ({
 }: ResourceCardProps) => {
   const [likes, setLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"none" | "some" | "all">("none");
+  const [totalCollections, setTotalCollections] = useState(0);
+  const [savedCollections, setSavedCollections] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCollectionDialog, setShowCollectionDialog] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!id) return; // Skip if no id is provided
+    if (!id || !user) return; // Skip if no id or user
 
     const loadInitialData = async () => {
       try {
@@ -109,14 +112,31 @@ export const ResourceCard = ({
             .maybeSingle();
           setIsLiked(!!likeData);
 
-          // Check if resource is saved in any collection
-          const { data: collectionData } = await supabase
+          // Get total number of user's collections
+          const { data: userCollections, error: collectionsError } =
+            await supabase
+              .from("collections")
+              .select("id")
+              .eq("user_id", user.id);
+
+          if (collectionsError) throw collectionsError;
+          setTotalCollections(userCollections?.length || 0);
+
+          // Check in how many collections this resource is saved
+          const { data: savedData, error: savedError } = await supabase
             .from("collection_resources")
-            .select("id")
+            .select("collection_id")
             .eq("resource_id", id)
-            .eq("user_id", user.id)
-            .maybeSingle();
-          setIsSaved(!!collectionData);
+            .eq("user_id", user.id);
+
+          if (savedError) throw savedError;
+          const savedCount = savedData?.length || 0;
+          setSavedCollections(savedCount);
+
+          // Update save status
+          if (savedCount === 0) setSaveStatus("none");
+          else if (savedCount === userCollections?.length) setSaveStatus("all");
+          else setSaveStatus("some");
         }
       } catch (error) {
         console.error("Error loading initial data:", error);
@@ -125,10 +145,10 @@ export const ResourceCard = ({
 
     loadInitialData();
 
-    // Subscribe to likes changes
-    let channel;
+    // Subscribe to likes and bookmarks changes
+    let likesChannel, bookmarksChannel;
     try {
-      channel = supabase
+      likesChannel = supabase
         .channel(`likes:${id}`)
         .on(
           "postgres_changes",
@@ -143,14 +163,52 @@ export const ResourceCard = ({
           },
         )
         .subscribe();
+
+      bookmarksChannel = supabase
+        .channel(`bookmarks:${id}:${user.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "collection_resources",
+            filter: `resource_id=eq.${id} and user_id=eq.${user.id}`,
+          },
+          async () => {
+            // Get fresh data for both collections and saves
+            const [{ data: userCollections }, { data: savedData }] =
+              await Promise.all([
+                supabase
+                  .from("collections")
+                  .select("id")
+                  .eq("user_id", user.id),
+                supabase
+                  .from("collection_resources")
+                  .select("collection_id")
+                  .eq("resource_id", id)
+                  .eq("user_id", user.id),
+              ]);
+
+            const totalCount = userCollections?.length || 0;
+            const savedCount = savedData?.length || 0;
+
+            setTotalCollections(totalCount);
+            setSavedCollections(savedCount);
+
+            // Update save status
+            if (savedCount === 0) setSaveStatus("none");
+            else if (savedCount === totalCount) setSaveStatus("all");
+            else setSaveStatus("some");
+          },
+        )
+        .subscribe();
     } catch (error) {
       console.error("Error setting up realtime subscription:", error);
     }
 
     return () => {
-      if (channel) {
-        supabase.removeChannel(channel);
-      }
+      if (likesChannel) supabase.removeChannel(likesChannel);
+      if (bookmarksChannel) supabase.removeChannel(bookmarksChannel);
     };
   }, [id, user]);
 
@@ -253,22 +311,32 @@ export const ResourceCard = ({
                 <span className="text-sm text-gray-500 min-w-[1rem] text-start">
                   {likes}
                 </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={`h-8 w-8 hover:bg-gray-700/50 transition-colors ${isSaved ? "text-violet-500" : "text-gray-500"}`}
-                  onClick={() =>
-                    user
-                      ? setShowCollectionDialog(true)
-                      : setShowAuthModal(true)
-                  }
-                >
-                  {isSaved ? (
-                    <BookmarkCheck className="h-4 w-4" />
-                  ) : (
-                    <Bookmark className="h-4 w-4" />
-                  )}
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={`h-8 w-8 hover:bg-gray-700/50 transition-colors ${saveStatus !== "none" ? "text-violet-500" : "text-gray-500"}`}
+                      onClick={() =>
+                        user
+                          ? setShowCollectionDialog(true)
+                          : setShowAuthModal(true)
+                      }
+                    >
+                      {saveStatus === "none" && <Plus className="h-4 w-4" />}
+                      {saveStatus === "some" && (
+                        <ListPlus className="h-4 w-4" />
+                      )}
+                      {saveStatus === "all" && <Check className="h-4 w-4" />}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    {saveStatus === "none" && "Add to collection"}
+                    {saveStatus === "some" &&
+                      `Saved in ${savedCollections} collection${savedCollections !== 1 ? "s" : ""}`}
+                    {saveStatus === "all" && "Saved in all collections"}
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </div>
           </div>
