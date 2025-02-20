@@ -106,7 +106,7 @@ export function AuthModal({ open = true, onOpenChange }: AuthModalProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Welcome to ToolForge</DialogTitle>
+          <DialogTitle>Welcome to DevCourier</DialogTitle>
           <DialogDescription>
             Join our community to save and organize your favorite development
             resources

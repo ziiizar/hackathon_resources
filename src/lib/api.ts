@@ -14,18 +14,23 @@ export type Subcategory =
 export async function getLikes(resourceId: string) {
   if (!resourceId) return 0;
 
-  const { data, error } = await supabase
-    .from("resources")
-    .select("likes_count")
-    .eq("id", resourceId)
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from("resources")
+      .select("likes_count")
+      .eq("id", resourceId)
+      .single();
 
-  if (error) {
+    if (error) {
+      console.error("Error fetching likes:", error);
+      return 0;
+    }
+
+    return data?.likes_count || 0;
+  } catch (error) {
     console.error("Error fetching likes:", error);
-    throw error;
+    return 0;
   }
-
-  return data?.likes_count || 0;
 }
 
 export async function recordView(resourceId: string, userId: string) {
@@ -56,15 +61,17 @@ export async function toggleLike(resourceId: string, userId: string) {
 
   try {
     // First check if the like exists
-    const { data: existingLike } = await supabase
+    const { data: existingLike, error: checkError } = await supabase
       .from("likes")
       .select("id")
       .eq("resource_id", resourceId)
       .eq("user_id", userId)
       .maybeSingle();
 
+    if (checkError) throw checkError;
+
     if (existingLike) {
-      // Unlike: Delete the like and decrement counter
+      // Unlike: Delete the like
       const { error: deleteError } = await supabase
         .from("likes")
         .delete()
@@ -74,15 +81,14 @@ export async function toggleLike(resourceId: string, userId: string) {
       if (deleteError) throw deleteError;
 
       // Update resources counter
-      const { error: updateError } = await supabase.rpc("decrement_likes", {
-        resource_id: resourceId,
-      });
-
-      if (updateError) throw updateError;
+      await supabase
+        .from("resources")
+        .update({ likes_count: supabase.raw("likes_count - 1") })
+        .eq("id", resourceId);
 
       return false;
     } else {
-      // Like: Insert new like and increment counter
+      // Like: Insert new like
       const { error: insertError } = await supabase.from("likes").insert({
         resource_id: resourceId,
         user_id: userId,
@@ -91,11 +97,10 @@ export async function toggleLike(resourceId: string, userId: string) {
       if (insertError) throw insertError;
 
       // Update resources counter
-      const { error: updateError } = await supabase.rpc("increment_likes", {
-        resource_id: resourceId,
-      });
-
-      if (updateError) throw updateError;
+      await supabase
+        .from("resources")
+        .update({ likes_count: supabase.raw("likes_count + 1") })
+        .eq("id", resourceId);
 
       return true;
     }

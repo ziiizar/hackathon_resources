@@ -90,39 +90,55 @@ export const ResourceCard = ({
   useEffect(() => {
     if (!id) return; // Skip if no id is provided
 
-    // Load initial likes count
-    getLikes(id).then(setLikes);
+    const loadInitialData = async () => {
+      try {
+        // Load initial likes count
+        const likesCount = await getLikes(id);
+        setLikes(likesCount);
 
-    // Check if user has liked this resource
-    if (user) {
-      supabase
-        .from("likes")
-        .select("id")
-        .eq("resource_id", id)
-        .eq("user_id", user.id)
-        .maybeSingle()
-        .then(({ data }) => setIsLiked(!!data));
-    }
+        // Check if user has liked this resource
+        if (user) {
+          const { data } = await supabase
+            .from("likes")
+            .select("id")
+            .eq("resource_id", id)
+            .eq("user_id", user.id)
+            .maybeSingle();
+          setIsLiked(!!data);
+        }
+      } catch (error) {
+        console.error("Error loading initial data:", error);
+      }
+    };
+
+    loadInitialData();
 
     // Subscribe to likes changes
-    const channel = supabase
-      .channel(`likes:${id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "likes",
-          filter: `resource_id=eq.${id}`,
-        },
-        () => {
-          getLikes(id).then(setLikes);
-        },
-      )
-      .subscribe();
+    let channel;
+    try {
+      channel = supabase
+        .channel(`likes:${id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "likes",
+            filter: `resource_id=eq.${id}`,
+          },
+          () => {
+            getLikes(id).then(setLikes).catch(console.error);
+          },
+        )
+        .subscribe();
+    } catch (error) {
+      console.error("Error setting up realtime subscription:", error);
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, [id, user]);
 

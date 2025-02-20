@@ -18,7 +18,7 @@ const SupportSection = () => {
         </div>
 
         <h1 className="text-5xl font-bold text-white mb-4">
-          Help Us Keep ToolForge Free
+          Help Us Keep DevCourier Free
         </h1>
         <p className="text-xl text-gray-400 mb-16">
           Your support helps us maintain and improve the platform for everyone
@@ -28,7 +28,7 @@ const SupportSection = () => {
           <div className="flex flex-col items-center gap-6 mb-8">
             <Coffee className="h-16 w-16 text-blue-400" />
             <p className="text-lg text-gray-300">
-              If you find ToolForge useful, consider buying us a coffee!
+              If you find DevCourier useful, consider buying us a coffee!
             </p>
           </div>
 
@@ -52,7 +52,7 @@ const SupportSection = () => {
             className="w-full h-14 text-lg font-medium bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white gap-2 shadow-lg shadow-blue-500/20 transition-all duration-300 hover:shadow-blue-500/40"
           >
             <Sparkles className="h-5 w-5" />
-            Support ToolForge
+            Support DevCourier
           </Button>
         </div>
       </div>
