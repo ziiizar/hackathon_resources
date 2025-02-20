@@ -17,6 +17,8 @@ import {
   Wrench,
   ExternalLink,
   Heart,
+  Bookmark,
+  BookmarkCheck,
 } from "lucide-react";
 import { useAuth } from "@/components/auth";
 import { useEffect, useState } from "react";
@@ -82,6 +84,7 @@ export const ResourceCard = ({
 }: ResourceCardProps) => {
   const [likes, setLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCollectionDialog, setShowCollectionDialog] = useState(false);
   const { user } = useAuth();
@@ -98,13 +101,22 @@ export const ResourceCard = ({
 
         // Check if user has liked this resource
         if (user) {
-          const { data } = await supabase
+          const { data: likeData } = await supabase
             .from("likes")
             .select("id")
             .eq("resource_id", id)
             .eq("user_id", user.id)
             .maybeSingle();
-          setIsLiked(!!data);
+          setIsLiked(!!likeData);
+
+          // Check if resource is saved in any collection
+          const { data: collectionData } = await supabase
+            .from("collection_resources")
+            .select("id")
+            .eq("resource_id", id)
+            .eq("user_id", user.id)
+            .maybeSingle();
+          setIsSaved(!!collectionData);
         }
       } catch (error) {
         console.error("Error loading initial data:", error);
@@ -170,6 +182,7 @@ export const ResourceCard = ({
       });
     }
   };
+
   const Icon = getIconByType(type);
   const categoryColor = getCategoryColor(type);
 
@@ -242,15 +255,19 @@ export const ResourceCard = ({
                 </span>
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="text-sm text-gray-500 hover:text-gray-400"
+                  size="icon"
+                  className={`h-8 w-8 hover:bg-gray-700/50 transition-colors ${isSaved ? "text-violet-500" : "text-gray-500"}`}
                   onClick={() =>
                     user
                       ? setShowCollectionDialog(true)
                       : setShowAuthModal(true)
                   }
                 >
-                  Save
+                  {isSaved ? (
+                    <BookmarkCheck className="h-4 w-4" />
+                  ) : (
+                    <Bookmark className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>

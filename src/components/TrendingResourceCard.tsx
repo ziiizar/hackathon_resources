@@ -80,7 +80,7 @@ export function TrendingResourceCard({
       {screenshot_url ? (
         <>
           <div
-            className="absolute inset-0 bg-cover bg-center blur-[2px]"
+            className="absolute inset-0 bg-cover bg-center blur-[4px]"
             style={{ backgroundImage: `url(${screenshot_url})` }}
           />
           <div className="absolute inset-0 bg-black/40" />
@@ -155,10 +155,6 @@ export function TrendingResourceCard({
                 <span className="text-gray-400">{likes_count}</span>
               </Button>
             </div>
-
-            <Button variant="ghost" size="icon" className="hover:bg-white/10">
-              <ExternalLink className="h-4 w-4 text-gray-400" />
-            </Button>
           </div>
         </motion.div>
       </CardContent>

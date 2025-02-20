@@ -11,7 +11,7 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="flex items-center gap-1">
+    <nav className="flex items-center gap-2">
       {navItems.map((item) => {
         const Icon = item.icon;
         return (
@@ -19,7 +19,7 @@ const Navigation = () => {
             <Button
               variant={location.pathname === item.path ? "default" : "ghost"}
               size="sm"
-              className="gap-2 font-medium transition-colors hover:bg-white/10"
+              className="gap-2 font-medium transition-colors hover:bg-white/10 hover:text-white"
             >
               <Icon className="h-4 w-4" />
               {item.label}
