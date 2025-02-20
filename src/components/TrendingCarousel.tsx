@@ -8,7 +8,7 @@ import {
 } from "./ui/carousel";
 import { TrendingResourceCard } from "./TrendingResourceCard";
 import { getResources } from "@/lib/api";
-import type { ResourceWithRelations } from "@/lib/data";
+import type { ResourceWithRelations, ResourceType } from "@/lib/data";
 import { Skeleton } from "./ui/skeleton";
 import AutoplayPlugin, { AutoplayType } from "embla-carousel-autoplay";
 type CreatePluginType<T, U> = any;
