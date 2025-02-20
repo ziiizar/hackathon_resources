@@ -20,6 +20,8 @@ interface TrendingResourceCardProps {
   url: string;
   likes_count: number;
   trending_score: number;
+  screenshot_url?: string;
+  logo_url?: string;
 }
 
 export function TrendingResourceCard({
@@ -31,6 +33,8 @@ export function TrendingResourceCard({
   url,
   likes_count,
   trending_score,
+  screenshot_url,
+  logo_url,
 }: TrendingResourceCardProps) {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
@@ -70,12 +74,32 @@ export function TrendingResourceCard({
 
   return (
     <Card
-      className="group relative overflow-hidden bg-gradient-to-br from-[#1a1f35] to-[#111827] border-0 h-[400px] cursor-pointer transition-all duration-700 hover:shadow-2xl hover:shadow-violet-500/10"
+      className="group relative overflow-hidden border-0 h-[400px] cursor-pointer transition-all duration-700 hover:shadow-2xl hover:shadow-violet-500/10"
       onClick={handleClick}
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent z-10" />
+      {screenshot_url ? (
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center blur-[2px]"
+            style={{ backgroundImage: `url(${screenshot_url})` }}
+          />
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/40 z-10" />
+        </>
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-[#1a1f35] to-[#111827]" />
+      )}
 
       <CardContent className="relative h-full p-8 flex flex-col justify-end z-20">
+        {logo_url && (
+          <div className="absolute top-4 left-4 w-12 h-12 rounded-lg overflow-hidden bg-white/10 backdrop-blur-md p-2">
+            <img
+              src={logo_url}
+              alt="Logo"
+              className="w-full h-full object-contain"
+            />
+          </div>
+        )}
         <div className="absolute top-4 right-4 flex items-center gap-2">
           <Badge
             className="bg-violet-500/20 text-violet-300 border border-violet-500/30"
