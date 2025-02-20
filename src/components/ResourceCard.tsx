@@ -134,19 +134,22 @@ export const ResourceCard = ({
       return;
     }
 
-    try {
-      const newIsLiked = await toggleLike(id, user.id);
-      setIsLiked(newIsLiked);
+    // Optimistically update UI
+    const previousIsLiked = isLiked;
+    const previousLikes = likes;
+    setIsLiked(!isLiked);
+    setLikes((prev) => prev + (isLiked ? -1 : 1));
 
-      toast({
-        title: newIsLiked ? "Resource liked!" : "Resource unliked",
-        duration: 1500,
-      });
+    try {
+      await toggleLike(id, user.id);
     } catch (error) {
+      // Revert optimistic update on error
+      setIsLiked(previousIsLiked);
+      setLikes(previousLikes);
       console.error("Error toggling like:", error);
       toast({
         title: "Error",
-        description: "Could not update like status",
+        description: "Could not update like status. Please try again.",
         variant: "destructive",
       });
     }
