@@ -82,37 +82,50 @@ export function AddToCollectionDialog({
   const toggleCollection = async (collectionId: string) => {
     setSaving(collectionId);
 
+    // Store previous state for rollback
+    const previousSavedCollections = new Set(savedCollections);
+
     try {
-      if (savedCollections.has(collectionId)) {
-        // Remove from collection
-        const { error } = await supabase
-          .from("collection_resources")
-          .delete()
-          .eq("collection_id", collectionId)
-          .eq("resource_id", resourceId);
+      const isRemoving = savedCollections.has(collectionId);
 
-        if (error) throw error;
-
+      // Optimistically update UI
+      if (isRemoving) {
         setSavedCollections((prev) => {
           const next = new Set(prev);
           next.delete(collectionId);
           return next;
         });
+      } else {
+        setSavedCollections((prev) => new Set([...prev, collectionId]));
+      }
+
+      // Perform the actual operation
+      if (isRemoving) {
+        const { error } = await supabase
+          .from("collection_resources")
+          .delete()
+          .eq("collection_id", collectionId)
+          .eq("resource_id", resourceId).select(`
+            collection_id,
+            collections!inner(user_id)
+          `);
+
+        if (error) throw error;
 
         toast({
           title: "Removed from collection",
           description: "Resource removed from collection successfully.",
         });
       } else {
-        // Add to collection
         const { error } = await supabase.from("collection_resources").insert({
           collection_id: collectionId,
           resource_id: resourceId,
-        });
+        }).select(`
+            collection_id,
+            collections!inner(user_id)
+          `);
 
         if (error) throw error;
-
-        setSavedCollections((prev) => new Set([...prev, collectionId]));
 
         toast({
           title: "Added to collection",
@@ -121,9 +134,11 @@ export function AddToCollectionDialog({
       }
     } catch (error) {
       console.error("Error toggling collection:", error);
+      // Revert to previous state
+      setSavedCollections(previousSavedCollections);
       toast({
         title: "Error",
-        description: "Could not update collection",
+        description: "Could not update collection. Please try again.",
         variant: "destructive",
       });
     } finally {

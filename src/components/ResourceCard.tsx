@@ -176,6 +176,7 @@ export const ResourceCard = ({
       )
       .subscribe();
 
+    // Subscribe to collection_resources changes
     const bookmarksChannel = supabase
       .channel(`bookmarks:${id}:${user.id}`)
       .on(
@@ -186,13 +187,35 @@ export const ResourceCard = ({
           table: "collection_resources",
           filter: `resource_id=eq.${id}`,
         },
-        checkSaveStatus,
+        async (payload) => {
+          console.log("Collection change detected:", payload);
+          await checkSaveStatus();
+        },
+      )
+      .subscribe();
+
+    // Also subscribe to collections changes
+    const collectionsChannel = supabase
+      .channel(`collections:${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "collections",
+          filter: `user_id=eq.${user.id}`,
+        },
+        async () => {
+          console.log("Collections changed");
+          await checkSaveStatus();
+        },
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(likesChannel);
       supabase.removeChannel(bookmarksChannel);
+      supabase.removeChannel(collectionsChannel);
     };
   }, [id, user]);
 
