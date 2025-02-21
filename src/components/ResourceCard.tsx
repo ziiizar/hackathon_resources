@@ -93,8 +93,47 @@ export const ResourceCard = ({
   const { user } = useAuth();
   const { toast } = useToast();
 
+  const checkSaveStatus = async () => {
+    if (!user || !id) return;
+
+    try {
+      // Get total number of user's collections
+      const { data: userCollections, error: collectionsError } = await supabase
+        .from("collections")
+        .select("id")
+        .eq("user_id", user.id);
+
+      if (collectionsError) throw collectionsError;
+      const totalCount = userCollections?.length || 0;
+      setTotalCollections(totalCount);
+
+      // Get collections where this resource is saved
+      const { data: savedData, error: savedError } = await supabase
+        .from("collection_resources")
+        .select(
+          `
+          collection_id,
+          collections!inner(id)
+        `,
+        )
+        .eq("resource_id", id)
+        .eq("collections.user_id", user.id);
+
+      if (savedError) throw savedError;
+      const savedCount = savedData?.length || 0;
+      setSavedCollections(savedCount);
+
+      // Update save status
+      if (savedCount === 0) setSaveStatus("none");
+      else if (savedCount === totalCount) setSaveStatus("all");
+      else setSaveStatus("some");
+    } catch (error) {
+      console.error("Error checking save status:", error);
+    }
+  };
+
   useEffect(() => {
-    if (!id || !user) return; // Skip if no id or user
+    if (!id || !user) return;
 
     const loadInitialData = async () => {
       try {
@@ -103,41 +142,16 @@ export const ResourceCard = ({
         setLikes(likesCount);
 
         // Check if user has liked this resource
-        if (user) {
-          const { data: likeData } = await supabase
-            .from("likes")
-            .select("id")
-            .eq("resource_id", id)
-            .eq("user_id", user.id)
-            .maybeSingle();
-          setIsLiked(!!likeData);
+        const { data: likeData } = await supabase
+          .from("likes")
+          .select("id")
+          .eq("resource_id", id)
+          .eq("user_id", user.id)
+          .maybeSingle();
+        setIsLiked(!!likeData);
 
-          // Get total number of user's collections
-          const { data: userCollections, error: collectionsError } =
-            await supabase
-              .from("collections")
-              .select("id")
-              .eq("user_id", user.id);
-
-          if (collectionsError) throw collectionsError;
-          setTotalCollections(userCollections?.length || 0);
-
-          // Check in how many collections this resource is saved
-          const { data: savedData, error: savedError } = await supabase
-            .from("collection_resources")
-            .select("collection_id")
-            .eq("resource_id", id)
-            .eq("user_id", user.id);
-
-          if (savedError) throw savedError;
-          const savedCount = savedData?.length || 0;
-          setSavedCollections(savedCount);
-
-          // Update save status
-          if (savedCount === 0) setSaveStatus("none");
-          else if (savedCount === userCollections?.length) setSaveStatus("all");
-          else setSaveStatus("some");
-        }
+        // Check save status
+        await checkSaveStatus();
       } catch (error) {
         console.error("Error loading initial data:", error);
       }
@@ -146,74 +160,44 @@ export const ResourceCard = ({
     loadInitialData();
 
     // Subscribe to likes and bookmarks changes
-    let likesChannel, bookmarksChannel;
-    try {
-      likesChannel = supabase
-        .channel(`likes:${id}`)
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "likes",
-            filter: `resource_id=eq.${id}`,
-          },
-          () => {
-            getLikes(id).then(setLikes).catch(console.error);
-          },
-        )
-        .subscribe();
+    const likesChannel = supabase
+      .channel(`likes:${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "likes",
+          filter: `resource_id=eq.${id}`,
+        },
+        () => {
+          getLikes(id).then(setLikes).catch(console.error);
+        },
+      )
+      .subscribe();
 
-      bookmarksChannel = supabase
-        .channel(`bookmarks:${id}:${user.id}`)
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "collection_resources",
-            filter: `resource_id=eq.${id} and user_id=eq.${user.id}`,
-          },
-          async () => {
-            // Get fresh data for both collections and saves
-            const [{ data: userCollections }, { data: savedData }] =
-              await Promise.all([
-                supabase
-                  .from("collections")
-                  .select("id")
-                  .eq("user_id", user.id),
-                supabase
-                  .from("collection_resources")
-                  .select("collection_id")
-                  .eq("resource_id", id)
-                  .eq("user_id", user.id),
-              ]);
-
-            const totalCount = userCollections?.length || 0;
-            const savedCount = savedData?.length || 0;
-
-            setTotalCollections(totalCount);
-            setSavedCollections(savedCount);
-
-            // Update save status
-            if (savedCount === 0) setSaveStatus("none");
-            else if (savedCount === totalCount) setSaveStatus("all");
-            else setSaveStatus("some");
-          },
-        )
-        .subscribe();
-    } catch (error) {
-      console.error("Error setting up realtime subscription:", error);
-    }
+    const bookmarksChannel = supabase
+      .channel(`bookmarks:${id}:${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "collection_resources",
+          filter: `resource_id=eq.${id}`,
+        },
+        checkSaveStatus,
+      )
+      .subscribe();
 
     return () => {
-      if (likesChannel) supabase.removeChannel(likesChannel);
-      if (bookmarksChannel) supabase.removeChannel(bookmarksChannel);
+      supabase.removeChannel(likesChannel);
+      supabase.removeChannel(bookmarksChannel);
     };
   }, [id, user]);
 
   const handleLikeClick = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
+    e.stopPropagation();
 
     if (!user) {
       setShowAuthModal(true);
