@@ -122,60 +122,67 @@ export async function getResources(
     searchQuery?: string;
   } = {},
 ) {
-  let query = supabase.from("resources").select(`
-    *,
-    subcategories (*, 
-      categories (*)
-    )
-  `);
+  try {
+    let query = supabase.from("resources").select(`
+        *,
+        subcategories!inner (*, 
+          categories!inner (*)
+        )
+      `);
 
-  // Aplicar ordenamiento primero
-  switch (options.sortBy) {
-    case "likes":
-      query = query.order("likes_count", { ascending: false });
-      break;
-    case "trending":
-    case "relevance":
-      query = query.order("trending_score", { ascending: false });
-      break;
-    default:
-      // Default to recent
-      query = query.order("created_at", { ascending: false });
+    // Aplicar filtros
+    if (options.categoryId) {
+      console.log("Filtering by category:", options.categoryId);
+      query = query.eq("subcategories.categories.id", options.categoryId);
+    }
+
+    if (options.subcategoryId) {
+      console.log("Filtering by subcategory:", options.subcategoryId);
+      query = query.eq("subcategory_id", options.subcategoryId);
+    }
+
+    // Aplicar ordenamiento
+    switch (options.sortBy) {
+      case "likes":
+        query = query.order("likes_count", { ascending: false });
+        break;
+      case "trending":
+      case "relevance":
+        query = query.order("trending_score", { ascending: false });
+        break;
+      default:
+        // Default to recent
+        query = query.order("created_at", { ascending: false });
+    }
+
+    if (options.searchQuery) {
+      query = query.or(
+        `title.ilike.%${options.searchQuery}%,description.ilike.%${options.searchQuery}%,subcategories.name.ilike.%${options.searchQuery}%,subcategories.categories.name.ilike.%${options.searchQuery}%`,
+      );
+    }
+
+    // Aplicar paginación
+    if (options.page && options.limit) {
+      const start = (options.page - 1) * options.limit;
+      const end = start + options.limit - 1;
+      query = query.range(start, end);
+    } else if (options.limit) {
+      query = query.limit(options.limit);
+    }
+
+    // Get the data
+    const { data: resources, error: resourcesError } = await query;
+
+    if (resourcesError) {
+      console.error("Error fetching resources:", resourcesError);
+      throw resourcesError;
+    }
+
+    return resources || [];
+  } catch (error) {
+    console.error("Error in getResources:", error);
+    throw error;
   }
-
-  // Aplicar filtros
-  if (options.categoryId) {
-    query = query.eq("subcategories.category_id", options.categoryId);
-  }
-
-  if (options.subcategoryId) {
-    query = query.eq("subcategory_id", options.subcategoryId);
-  }
-
-  if (options.searchQuery) {
-    query = query.or(
-      `title.ilike.%${options.searchQuery}%,description.ilike.%${options.searchQuery}%,subcategories.name.ilike.%${options.searchQuery}%,subcategories.categories.name.ilike.%${options.searchQuery}%`,
-    );
-  }
-
-  // Aplicar paginación
-  if (options.page && options.limit) {
-    const start = (options.page - 1) * options.limit;
-    const end = start + options.limit - 1;
-    query = query.range(start, end);
-  } else if (options.limit) {
-    query = query.limit(options.limit);
-  }
-
-  // Get the data
-  const { data: resources, error: resourcesError } = await query;
-
-  if (resourcesError) {
-    console.error("Error fetching resources:", resourcesError);
-    throw resourcesError;
-  }
-
-  return resources || [];
 }
 
 export async function getCategories() {

@@ -119,6 +119,13 @@ const ResourceGrid = ({
         setError(null);
         setIsFetching(false);
 
+        console.log("Loading resources with filters:", {
+          sortBy,
+          categoryId: selectedCategory,
+          subcategoryId: selectedSubcategory,
+          searchQuery,
+        });
+
         const data = await getResources({
           sortBy,
           page: 1,
@@ -128,6 +135,7 @@ const ResourceGrid = ({
           searchQuery: searchQuery,
         });
 
+        console.log("Loaded resources:", data);
         setResources(data);
         setHasMore(data.length === ITEMS_PER_PAGE);
       } catch (e) {

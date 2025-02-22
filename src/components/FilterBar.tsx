@@ -50,6 +50,7 @@ const FilterBar = ({
   }, []);
 
   const handleCategoryChange = (value: string) => {
+    console.log("Category changed to:", value);
     const categoryId = value === "all" ? null : value;
     setSelectedCategory(categoryId);
     setSelectedSubcategory(null);
@@ -58,6 +59,7 @@ const FilterBar = ({
   };
 
   const handleSubcategoryChange = (value: string) => {
+    console.log("Subcategory changed to:", value);
     const subcategoryId = value === "all" ? null : value;
     setSelectedSubcategory(subcategoryId);
     onSubcategoryChange(subcategoryId);
