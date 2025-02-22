@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 interface ResourceGridProps {
   selectedCategory?: string | null;
   selectedSubcategory?: string | null;
-  searchQuery?: string;
+
   sortBy?: "recent" | "likes" | "relevance";
   showFavorites?: boolean;
 }
@@ -21,7 +21,7 @@ const ITEMS_PER_PAGE = 12;
 const ResourceGrid = ({
   selectedCategory = null,
   selectedSubcategory = null,
-  searchQuery = "",
+
   sortBy = "recent",
   showFavorites = false,
 }: ResourceGridProps) => {
@@ -79,7 +79,6 @@ const ResourceGrid = ({
         limit: ITEMS_PER_PAGE,
         categoryId: selectedCategory,
         subcategoryId: selectedSubcategory,
-        searchQuery: searchQuery,
       });
 
       if (data.length < ITEMS_PER_PAGE) {
@@ -105,7 +104,6 @@ const ResourceGrid = ({
     sortBy,
     selectedCategory,
     selectedSubcategory,
-    searchQuery,
   ]);
 
   // Carga inicial y reset cuando cambian los filtros
@@ -123,7 +121,6 @@ const ResourceGrid = ({
           sortBy,
           categoryId: selectedCategory,
           subcategoryId: selectedSubcategory,
-          searchQuery,
         });
 
         const data = await getResources({
@@ -132,7 +129,6 @@ const ResourceGrid = ({
           limit: ITEMS_PER_PAGE,
           categoryId: selectedCategory,
           subcategoryId: selectedSubcategory,
-          searchQuery: searchQuery,
         });
 
         console.log("Loaded resources:", data);
@@ -147,7 +143,7 @@ const ResourceGrid = ({
     };
 
     loadInitialData();
-  }, [sortBy, selectedCategory, selectedSubcategory, searchQuery]);
+  }, [sortBy, selectedCategory, selectedSubcategory]);
 
   const visibleResources = showFavorites
     ? resources.filter((resource) => likedResources.has(resource.id))
