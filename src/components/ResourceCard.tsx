@@ -132,26 +132,28 @@ export const ResourceCard = ({
     }
   };
 
+  // Load initial data and set up subscriptions
   useEffect(() => {
-    if (!id || !user) return;
+    if (!id) return;
 
     const loadInitialData = async () => {
       try {
-        // Load initial likes count
+        // Always load likes count
         const likesCount = await getLikes(id);
         setLikes(likesCount);
 
-        // Check if user has liked this resource
-        const { data: likeData } = await supabase
-          .from("likes")
-          .select("id")
-          .eq("resource_id", id)
-          .eq("user_id", user.id)
-          .maybeSingle();
-        setIsLiked(!!likeData);
+        // Only check user-specific data if logged in
+        if (user) {
+          const { data: likeData } = await supabase
+            .from("likes")
+            .select("id")
+            .eq("resource_id", id)
+            .eq("user_id", user.id)
+            .maybeSingle();
+          setIsLiked(!!likeData);
 
-        // Check save status
-        await checkSaveStatus();
+          await checkSaveStatus();
+        }
       } catch (error) {
         console.error("Error loading initial data:", error);
       }
@@ -159,7 +161,7 @@ export const ResourceCard = ({
 
     loadInitialData();
 
-    // Subscribe to likes and bookmarks changes
+    // Always subscribe to likes changes
     const likesChannel = supabase
       .channel(`likes:${id}`)
       .on(
@@ -176,46 +178,50 @@ export const ResourceCard = ({
       )
       .subscribe();
 
-    // Subscribe to collection_resources changes
-    const bookmarksChannel = supabase
-      .channel(`bookmarks:${id}:${user.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "collection_resources",
-          filter: `resource_id=eq.${id}`,
-        },
-        async (payload) => {
-          console.log("Collection change detected:", payload);
-          await checkSaveStatus();
-        },
-      )
-      .subscribe();
+    // Only set up collection-related subscriptions if user is logged in
+    let bookmarksChannel;
+    let collectionsChannel;
 
-    // Also subscribe to collections changes
-    const collectionsChannel = supabase
-      .channel(`collections:${user.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "collections",
-          filter: `user_id=eq.${user.id}`,
-        },
-        async () => {
-          console.log("Collections changed");
-          await checkSaveStatus();
-        },
-      )
-      .subscribe();
+    if (user) {
+      bookmarksChannel = supabase
+        .channel(`bookmarks:${id}:${user.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "collection_resources",
+            filter: `resource_id=eq.${id}`,
+          },
+          async (payload) => {
+            console.log("Collection change detected:", payload);
+            await checkSaveStatus();
+          },
+        )
+        .subscribe();
+
+      collectionsChannel = supabase
+        .channel(`collections:${user.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "collections",
+            filter: `user_id=eq.${user.id}`,
+          },
+          async () => {
+            console.log("Collections changed");
+            await checkSaveStatus();
+          },
+        )
+        .subscribe();
+    }
 
     return () => {
       supabase.removeChannel(likesChannel);
-      supabase.removeChannel(bookmarksChannel);
-      supabase.removeChannel(collectionsChannel);
+      if (bookmarksChannel) supabase.removeChannel(bookmarksChannel);
+      if (collectionsChannel) supabase.removeChannel(collectionsChannel);
     };
   }, [id, user]);
 
