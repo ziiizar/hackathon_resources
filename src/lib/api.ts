@@ -119,7 +119,6 @@ export async function getResources(
     limit?: number;
     categoryId?: string | null;
     subcategoryId?: string | null;
-    searchQuery?: string;
   } = {},
 ) {
   try {
@@ -153,12 +152,6 @@ export async function getResources(
       default:
         // Default to recent
         query = query.order("created_at", { ascending: false });
-    }
-
-    if (options.searchQuery) {
-      query = query.or(
-        `title.ilike.%${options.searchQuery}%,description.ilike.%${options.searchQuery}%,subcategories.name.ilike.%${options.searchQuery}%,subcategories.categories.name.ilike.%${options.searchQuery}%`,
-      );
     }
 
     // Aplicar paginación

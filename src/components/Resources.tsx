@@ -8,15 +8,11 @@ const Resources = () => {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(
     null,
   );
-  const [searchQuery, setSearchQuery] = useState("");
+
   const [sortBy, setSortBy] = useState<"recent" | "likes" | "relevance">(
     "recent",
   );
   const [showFavorites, setShowFavorites] = useState(false);
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
 
   const handleCategoryChange = (categoryId: string | null) => {
     setSelectedCategory(categoryId);
@@ -34,12 +30,11 @@ const Resources = () => {
   return (
     <div className="h-screen flex flex-col bg-[#0B1121] overflow-hidden">
       <div className="flex-none">
-        <Header onSearch={handleSearch} />
+        <Header />
       </div>
       <main className="flex-1 flex flex-col pt-[72px] overflow-hidden">
         <div className="flex-none">
           <FilterBar
-            onSearch={handleSearch}
             onCategoryChange={handleCategoryChange}
             onSubcategoryChange={handleSubcategoryChange}
             onSortChange={handleSortChange}
@@ -51,7 +46,6 @@ const Resources = () => {
           <ResourceGrid
             selectedCategory={selectedCategory}
             selectedSubcategory={selectedSubcategory}
-            searchQuery={searchQuery}
             sortBy={sortBy}
             showFavorites={showFavorites}
           />
