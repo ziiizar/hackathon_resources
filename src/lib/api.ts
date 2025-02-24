@@ -11,25 +11,51 @@ export type Subcategory =
     categories?: Category;
   };
 
-export async function getLikes(resourceId: string) {
-  if (!resourceId) return 0;
+export async function getLikesForResources(
+  resourceIds: string[],
+): Promise<{ [key: string]: number }> {
+  if (!resourceIds.length) return {};
 
   try {
     const { data, error } = await supabase
       .from("resources")
-      .select("likes_count")
-      .eq("id", resourceId)
-      .single();
+      .select("id, likes_count")
+      .in("id", resourceIds);
 
     if (error) {
       console.error("Error fetching likes:", error);
-      return 0;
+      return {};
     }
 
-    return data?.likes_count || 0;
+    return data.reduce((acc, resource) => {
+      acc[resource.id] = resource.likes_count || 0;
+      return acc;
+    }, {});
   } catch (error) {
     console.error("Error fetching likes:", error);
-    return 0;
+    return {};
+  }
+}
+
+export async function getUserLikesForResources(
+  userId: string,
+  resourceIds: string[],
+): Promise<Set<string>> {
+  if (!userId || !resourceIds.length) return new Set();
+
+  try {
+    const { data, error } = await supabase
+      .from("likes")
+      .select("resource_id")
+      .eq("user_id", userId)
+      .in("resource_id", resourceIds);
+
+    if (error) throw error;
+
+    return new Set(data.map((like) => like.resource_id));
+  } catch (error) {
+    console.error("Error fetching user likes:", error);
+    return new Set();
   }
 }
 

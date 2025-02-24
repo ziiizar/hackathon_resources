@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { ResourceCard } from "./ResourceCard";
-import { getResources } from "@/lib/api";
+import { getResources, getUserLikesForResources } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/auth";
 import type { ResourceWithRelations } from "@/lib/data";
@@ -37,22 +37,19 @@ const ResourceGrid = ({
 
   useEffect(() => {
     const loadLikedResources = async () => {
-      const { data: likes } = await supabase
-        .from("likes")
-        .select("resource_id")
-        .eq("user_id", user?.id || "");
+      if (!resources.length) return;
 
-      if (likes) {
-        setLikedResources(new Set(likes.map((like) => like.resource_id)));
-      }
+      const resourceIds = resources.map((r) => r.id);
+      const userLikes = await getUserLikesForResources(user.id, resourceIds);
+      setLikedResources(userLikes);
     };
 
-    if (user) {
+    if (user && resources.length) {
       loadLikedResources();
     } else {
       setLikedResources(new Set());
     }
-  }, [user]);
+  }, [user, resources]);
 
   const lastResourceRef = useCallback(
     (node: HTMLDivElement | null) => {

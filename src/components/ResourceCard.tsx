@@ -23,7 +23,12 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/auth";
 import { useEffect, useState } from "react";
-import { getLikes, toggleLike, recordView } from "@/lib/api";
+import {
+  getLikesForResources,
+  getUserLikesForResources,
+  toggleLike,
+  recordView,
+} from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "./ui/use-toast";
 import { AuthModal } from "./auth/AuthModal";
@@ -138,19 +143,14 @@ export const ResourceCard = ({
 
     const loadInitialData = async () => {
       try {
-        // Always load likes count
-        const likesCount = await getLikes(id);
-        setLikes(likesCount);
+        // Load likes count in batch
+        const likesData = await getLikesForResources([id]);
+        setLikes(likesData[id] || 0);
 
         // Only check user-specific data if logged in
         if (user) {
-          const { data: likeData } = await supabase
-            .from("likes")
-            .select("id")
-            .eq("resource_id", id)
-            .eq("user_id", user.id)
-            .maybeSingle();
-          setIsLiked(!!likeData);
+          const userLikes = await getUserLikesForResources(user.id, [id]);
+          setIsLiked(userLikes.has(id));
 
           await checkSaveStatus();
         }
@@ -173,7 +173,9 @@ export const ResourceCard = ({
           filter: `resource_id=eq.${id}`,
         },
         () => {
-          getLikes(id).then(setLikes).catch(console.error);
+          getLikesForResources([id])
+            .then((data) => setLikes(data[id] || 0))
+            .catch(console.error);
         },
       )
       .subscribe();

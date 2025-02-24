@@ -4,7 +4,12 @@ import { Button } from "./ui/button";
 import { Heart, ExternalLink, TrendingUp } from "lucide-react";
 import { useAuth } from "@/components/auth";
 import { useState, useEffect } from "react";
-import { toggleLike, recordView, getLikes } from "@/lib/api";
+import {
+  getLikesForResources,
+  getUserLikesForResources,
+  toggleLike,
+  recordView,
+} from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "./ui/use-toast";
 import { AuthModal } from "./auth/AuthModal";
@@ -33,7 +38,6 @@ export function TrendingResourceCard({
   subcategory,
   url,
   likes_count,
-  trending_score,
   screenshot_url,
   logo_url,
 }: TrendingResourceCardProps) {
@@ -48,13 +52,8 @@ export function TrendingResourceCard({
 
     const checkLikeStatus = async () => {
       try {
-        const { data } = await supabase
-          .from("likes")
-          .select("id")
-          .eq("resource_id", id)
-          .eq("user_id", user.id)
-          .maybeSingle();
-        setIsLiked(!!data);
+        const userLikes = await getUserLikesForResources(user.id, [id]);
+        setIsLiked(userLikes.has(id));
       } catch (error) {
         console.error("Error checking like status:", error);
       }
@@ -74,7 +73,9 @@ export function TrendingResourceCard({
           filter: `resource_id=eq.${id}`,
         },
         () => {
-          getLikes(id).then(setLocalLikesCount).catch(console.error);
+          getLikesForResources([id])
+            .then((data) => setLocalLikesCount(data[id] || 0))
+            .catch(console.error);
         },
       )
       .subscribe();
