@@ -11,10 +11,10 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import {
-  Code,
-  Database,
-  Server,
-  Wrench,
+  Layout,
+  Palette,
+  Bot,
+  MessageSquare,
   ExternalLink,
   Heart,
   Plus,
@@ -45,15 +45,15 @@ interface ResourceCardProps {
 const getIconByType = (type: ResourceType) => {
   switch (type) {
     case "Frontend":
-      return Code;
+      return Layout;
     case "Design":
-      return Wrench;
+      return Palette;
     case "AI Agents":
-      return Server;
+      return Bot;
     case "AI Chats":
-      return Database;
+      return MessageSquare;
     default:
-      return Code;
+      return Layout;
   }
 };
 
@@ -64,7 +64,7 @@ const getCategoryColor = (type: ResourceType) => {
     case "Design":
       return "bg-purple-500/10 text-purple-400 border-purple-500/20";
     case "AI Agents":
-      return "bg-green-500/10 text-green-400 border-green-500/20";
+      return "bg-amber-500/10 text-amber-400 border-amber-500/20";
     case "AI Chats":
       return "bg-orange-500/10 text-orange-400 border-orange-500/20";
     default:
@@ -293,17 +293,19 @@ export const ResourceCard = ({
 
         <CardFooter className="flex justify-between items-center mt-auto pt-0 pb-3">
           <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className={`${categoryColor} border`}>
-                {subcategory}
-              </Badge>
-              <Badge variant="secondary" className={categoryColor}>
-                {type}
-              </Badge>
+            <div className="flex items-center gap-2 max-w-[65%] overflow-hidden">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                <Badge
+                  variant="outline"
+                  className={`${categoryColor} border whitespace-nowrap`}
+                >
+                  {subcategory}
+                </Badge>
+              </div>
               {isWithinLastMonth(created_at) && (
                 <Badge
                   variant="secondary"
-                  className="bg-green-500/10 text-green-400 border-green-500/20"
+                  className="bg-green-500/10 text-green-400 border-green-500/20 whitespace-nowrap flex-shrink-0"
                 >
                   New
                 </Badge>
