@@ -1,4 +1,5 @@
 import { Routes, Route, useRoutes } from "react-router-dom";
+import ConfirmEmail from "./components/auth/ConfirmEmail";
 import Home from "./components/home";
 import Resources from "./components/Resources";
 import About from "./components/About";
@@ -22,6 +23,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="profile/:id" element={<ProfilePage />} />
         <Route path="collection/:id" element={<CollectionDetail />} />
+        <Route path="auth/confirm" element={<ConfirmEmail />} />
 
         {/* Add this before the catchall route */}
         {import.meta.env.VITE_TEMPO === "true" && <Route path="/tempobook/*" />}
