@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://devcourier.vercel.app/sitemap.xml
