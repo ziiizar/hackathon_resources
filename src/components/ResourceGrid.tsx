@@ -1,6 +1,10 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { ResourceCard } from "./ResourceCard";
-import { getResources, getUserLikesForResources } from "@/lib/api";
+import {
+  getResources,
+  getUserLikesForResources,
+  getSavedStatusForResources,
+} from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/auth";
 import type { ResourceWithRelations } from "@/lib/data";
