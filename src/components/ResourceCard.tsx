@@ -112,20 +112,9 @@ export const ResourceCard = ({
       const totalCount = userCollections?.length || 0;
       setTotalCollections(totalCount);
 
-      // Get collections where this resource is saved
-      const { data: savedData, error: savedError } = await supabase
-        .from("collection_resources")
-        .select(
-          `
-          collection_id,
-          collections!inner(id)
-        `,
-        )
-        .eq("resource_id", id)
-        .eq("collections.user_id", user.id);
-
-      if (savedError) throw savedError;
-      const savedCount = savedData?.length || 0;
+      // Get saved status from the optimized function
+      const savedStatus = await getSavedStatusForResources(user.id, [id]);
+      const savedCount = savedStatus[id]?.collections || 0;
       setSavedCollections(savedCount);
 
       // Update save status

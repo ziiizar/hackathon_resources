@@ -36,16 +36,21 @@ const ResourceGrid = ({
   const observer = useRef<IntersectionObserver>();
 
   useEffect(() => {
-    const loadLikedResources = async () => {
+    const loadResourceStatuses = async () => {
       if (!resources.length) return;
 
       const resourceIds = resources.map((r) => r.id);
-      const userLikes = await getUserLikesForResources(user.id, resourceIds);
+      const [userLikes, savedStatuses] = await Promise.all([
+        getUserLikesForResources(user.id, resourceIds),
+        getSavedStatusForResources(user.id, resourceIds),
+      ]);
+
       setLikedResources(userLikes);
+      // You can pass savedStatuses to ResourceCard components if needed
     };
 
     if (user && resources.length) {
-      loadLikedResources();
+      loadResourceStatuses();
     } else {
       setLikedResources(new Set());
     }

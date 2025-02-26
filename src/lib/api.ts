@@ -37,6 +37,47 @@ export async function getLikesForResources(
   }
 }
 
+export async function getSavedStatusForResources(
+  userId: string,
+  resourceIds: string[],
+): Promise<{ [key: string]: { saved: boolean; collections: number } }> {
+  if (!userId || !resourceIds.length) return {};
+
+  try {
+    // Get all collections where these resources are saved
+    const { data, error } = await supabase
+      .from("collection_resources")
+      .select(
+        `
+        resource_id,
+        collection_id,
+        collections!inner(user_id)
+      `,
+      )
+      .eq("collections.user_id", userId)
+      .in("resource_id", resourceIds);
+
+    if (error) throw error;
+
+    // Process the data to get saved status and collection count
+    const result = resourceIds.reduce((acc, resourceId) => {
+      const resourceSaves = data.filter(
+        (item) => item.resource_id === resourceId,
+      );
+      acc[resourceId] = {
+        saved: resourceSaves.length > 0,
+        collections: resourceSaves.length,
+      };
+      return acc;
+    }, {});
+
+    return result;
+  } catch (error) {
+    console.error("Error checking saved status:", error);
+    return {};
+  }
+}
+
 export async function getUserLikesForResources(
   userId: string,
   resourceIds: string[],
